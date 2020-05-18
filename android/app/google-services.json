@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "253025208867",
+    "firebase_url": "https://getfit-application.firebaseio.com",
+    "project_id": "getfit-application",
+    "storage_bucket": "getfit-application.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253025208867:android:c23eb728a71799b279ff96",
+        "android_client_info": {
+          "package_name": "com.getfit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253025208867-lgea0ttt59f4aulqe70nhnkgoo9n1j5l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.getfit",
+            "certificate_hash": "42f8d0fe2e0a123fdccb12fb78cc874e9c3e3a66"
+          }
+        },
+        {
+          "client_id": "253025208867-l6lvrcgv1e9gpviupsolua5n40ptakdq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXJ7ZkzbnRx9WinXafYuYIvgkiU8D8SuM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "253025208867-l6lvrcgv1e9gpviupsolua5n40ptakdq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "253025208867-kebt9bt2aijfstg2cd3s5o03c8a75k7g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.getFitAthletic"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253025208867:android:f5035563c0291e3279ff96",
+        "android_client_info": {
+          "package_name": "com.getfitnavigate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253025208867-l6lvrcgv1e9gpviupsolua5n40ptakdq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXJ7ZkzbnRx9WinXafYuYIvgkiU8D8SuM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "253025208867-l6lvrcgv1e9gpviupsolua5n40ptakdq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "253025208867-kebt9bt2aijfstg2cd3s5o03c8a75k7g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.getFitAthletic"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

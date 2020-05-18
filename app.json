@@ -1,0 +1,12 @@
+{
+  "name": "getFitNavigate",
+  "displayName": "getFitNavigate",
+  "expo": {
+    "ios": {
+      "bundleIdentifier": "com.app.getfitnavigate",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app requires access to the photo library."
+      }
+    }
+  }
+}
