@@ -1,0 +1,1 @@
+../../../../../node_modules/react-native-sha1/ios/sha1.h

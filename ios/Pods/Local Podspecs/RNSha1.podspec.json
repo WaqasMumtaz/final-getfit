@@ -1,0 +1,26 @@
+{
+  "name": "RNSha1",
+  "version": "1.2.3",
+  "summary": "Native sha1 react-native",
+  "authors": {
+    "name": "Hagen Huebel",
+    "email": "hhuebel@itinance.com",
+    "url": "hhuebel@itinance.com"
+  },
+  "homepage": "https://github.com/itinance/react-native-sha1",
+  "license": "MIT",
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source": {
+    "git": "https://github.com/marconett/react-native-sha1.git",
+    "tag": "1.2.3"
+  },
+  "source_files": "ios/**/*.{h,m,swift}",
+  "preserve_paths": "**/*.js",
+  "dependencies": {
+    "React": [
+
+    ]
+  }
+}

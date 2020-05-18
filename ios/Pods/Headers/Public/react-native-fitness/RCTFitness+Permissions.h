@@ -1,0 +1,1 @@
+../../../../../node_modules/@ovalmoney/react-native-fitness/ios/RCTFitness/RCTFitness+Permissions.h

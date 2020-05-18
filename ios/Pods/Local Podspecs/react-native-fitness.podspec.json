@@ -1,0 +1,34 @@
+{
+  "name": "react-native-fitness",
+  "version": "0.3.0",
+  "summary": "A React Native package that gives you access to Apple kit and Google Fit data.",
+  "authors": [
+    {
+      "Francesco Voto": "fv@ovalmoney.com"
+    },
+    {
+      "Andrea Pacino": "ap@ovalmoney.com"
+    },
+    {
+      "Stefano Cerelli": "stefano.cerelli@ovalmoney.com"
+    },
+    {
+      "Alessio Occhipinti": "alessio.occhipinti@ovalmoney.com"
+    }
+  ],
+  "homepage": "https://github.com/OvalMoney/react-native-fitness",
+  "license": "MIT",
+  "platforms": {
+    "ios": "7.0"
+  },
+  "source": {
+    "git": "git@github.com:OvalMoney/react-native-fitness.git",
+    "tag": "master"
+  },
+  "source_files": "ios/RCTFitness/**/*.{h,m}",
+  "dependencies": {
+    "React": [
+
+    ]
+  }
+}
