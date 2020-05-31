@@ -18,6 +18,8 @@ import firebasePushNotification from 'react-native-firebase';
 import OverlayLoader from '../Loader/OverlaySpinner';
 import 'firebase/firestore';
 const db = firebase.database();
+import Toast, { DURATION } from 'react-native-easy-toast';
+
 
 const { height } = Dimensions.get('window');
 class Login extends React.Component {
@@ -36,7 +38,9 @@ class Login extends React.Component {
       passwordNotMatch: '',
       psswrdNotMatchShow: false,
       emailAndPasswrd: false,
-      deviceToken:''
+      deviceToken:'',
+      position: 'bottom',
+
 
     }
     this.checkUserLogin()
@@ -48,6 +52,17 @@ class Login extends React.Component {
   componentWillUnmount(){
     this.focusListener.remove();
   }
+
+  toastFunction = (text, position, duration, withStyle) => {
+    this.setState({
+        position: position,
+    })
+    if (withStyle) {
+        this.refs.toastWithStyle.show(text, duration);
+    } else {
+        this.refs.toast.show(text, duration);
+    }
+} 
 
   // Start here firebase push notification
 getTokenPermission=()=>{
@@ -253,7 +268,9 @@ getTokenPermission=()=>{
         console.log(error)
         this.setState({
           isLoading: false,
-          emailAndPasswrd: true,
+          // emailAndPasswrd: true,
+        },()=>{
+            this.toastFunction('Please Check Internet Connection', this.state.position, DURATION.LENGTH_LONG, true);
         })
         setTimeout(() => {
           this.setState({
@@ -388,6 +405,17 @@ getTokenPermission=()=>{
             <Text style={styles.loginButton}>Log In</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }}></View>
+        </View>
+        <View>
+        <Toast ref="toastWithStyle"
+                    style={{ backgroundColor: '#FF6200' }}
+                    position={this.state.position}
+                    positionValue={50}
+                    fadeInDuration={750}
+                    fadeOutDuration={1000}
+                    opacity={0.8}
+                    textStyle={{ color: 'white' }}
+                />
         </View>
         <View style={{ flex: 2, flexDirection: 'row', justifyContent: 'flex-start', marginTop: 35, marginBottom: 12 }}>
           <TouchableOpacity style={styles.resetPassContainer} onPress={() => { navigate('ResetpasswordScreen') }} >

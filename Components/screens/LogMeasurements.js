@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import HttpUtils from '../Services/HttpUtils';
 import Toast, { DURATION } from 'react-native-easy-toast';
 // import PickDate from '../Common/datePicker';
-// import DatePicker from 'react-native-datepicker';
+import DatePicker from 'react-native-datepicker';
 import OverlayLoader from '../Loader/OverlaySpinner'
 import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
 
@@ -79,6 +79,7 @@ class LogMeasurementsScreen extends React.Component {
                 let dataFromLocalStorage = JSON.parse(value);
                 this.setState({
                     userId: dataFromLocalStorage._id,
+                    maxDate: date + '-' + month + '-' + year,
                     date: date + '-' + month + '-' + year,
                     time: hours + ':' + min + ':' + sec,
                     day: day,
@@ -221,17 +222,17 @@ class LogMeasurementsScreen extends React.Component {
 
         if (weight != '' && waistAtNaval != '') {
             addWeight.weight = weight + ' KG';
-            addWeight.arms = arms + ' Inches'
-            addWeight.neck = neck + ' Inches';
-            addWeight.shoulder = shoulder + ' Inches';
-            addWeight.biceps = biceps + ' Inches';
-            addWeight.chest = chest + ' Inches';
+            addWeight.arms = arms != '' ? arms + ' Inches' : 0 + ' Inches';
+            addWeight.neck = neck !='' ? neck + ' Inches' : 0 + ' Inches';
+            addWeight.shoulder = shoulder != '' ? shoulder + ' Inches' : 0 + ' Inches';
+            addWeight.biceps = biceps !='' ? biceps + ' Inches' : 0 + ' Inches';
+            addWeight.chest = chest !='' ? chest + ' Inches' : 0 + ' Inches';
             addWeight.waistAtNaval = waistAtNaval + ' Inches';
-            addWeight.below2Inches = below2Inches + ' Inches';
-            addWeight.above2Inches = above2Inches + ' Inches';
-            addWeight.calves = calves + ' Inches';
-            addWeight.hips = hips + ' Inches';
-            addWeight.thigh = thigh + ' Inches';
+            addWeight.below2Inches = below2Inches != '' ? below2Inches + ' Inches' : 0 + ' Inches';
+            addWeight.above2Inches = above2Inches != '' ? above2Inches + ' Inches' : 0 + ' Inches';
+            addWeight.calves = calves != '' ? calves + ' Inches' : 0 + ' Inches';
+            addWeight.hips = hips != '' ? hips + ' Inches' : 0 + ' Inches';
+            addWeight.thigh = thigh != '' ? thigh + ' Inches' : 0 + ' Inches';
             addWeight.month = monthArr[monthNo];
             addWeight.day = weekDay[day];
             addWeight.dayOfMonth = dayOfMonth;
@@ -246,7 +247,7 @@ class LogMeasurementsScreen extends React.Component {
             })
             //console.log(addWeight, 'addWeight')
             let dataUser = await HttpUtils.post('weightLog', addWeight)
-            //console.log(dataUser, 'dataUser')
+            console.log(dataUser, 'dataUser')
             let userMsg = dataUser.msg;
             if (dataUser.code == 200) {
                 this.setState({
@@ -304,34 +305,64 @@ class LogMeasurementsScreen extends React.Component {
             // console.log('All User Data >>',allUsersData); 
             for (var i in allUsersData) {
                 const allUsers = allUsersData[i];
-                // console.log('AAAA >>>', a);
                 if (allUsers.userId == userId) {
-                    // console.log('Current User Successfully Match');
-                    if (allUsers.dayOfMonth == dayOfMonth) {
-                        // console.log('Current Date Match Success');
+                    //  console.log('Current User Successfully Match');
+                      console.log('allUsers Data  >>>', allUsers);
+                    // if (allUsers.dayOfMonth == dayOfMonth) {
+                       const spaceIndexWeight = allUsers.weight.indexOf(' ');
+                    //    console.log('Weight >>', allUsers.weight);
+                       const weight = allUsers.weight.slice(0 , spaceIndexWeight);
+                       const spaceIndexNeck = allUsers.neck.indexOf(' ');
+                       const neck = allUsers.neck.slice(0 , spaceIndexNeck);
+                       const spaceIndexShoulder = allUsers.shoulder.indexOf(' ');
+                       const shoulder = allUsers.shoulder.slice(0 , spaceIndexShoulder);
+                       const spaceIndexBiceps = allUsers.biceps.indexOf(' ');
+                    //    console.log('space index bicep >>', spaceIndexBiceps);
+                       const biceps = allUsers.biceps.slice(0, spaceIndexBiceps);
+                       const spaceIndexChest = allUsers.chest.indexOf(' ');
+                       const chest = allUsers.chest.slice(0 , spaceIndexChest);
+                        console.log('waist At  waistAtNaval>>', allUsers.waistAtNaval);
+                       const spaceIndexWaistAtNaval = allUsers.waistAtNaval.indexOf(' ');
+                    //    console.log('index of spaceIndexWaistAtNaval >>', spaceIndexWaistAtNaval)
+                        const waistAtNaval = allUsers.waistAtNaval.slice(0 , spaceIndexWaistAtNaval);
+                    //    console.log('waistAtNaval', waistAtNaval)
+                       const spaceIndexBelow2Inches = allUsers.below2Inches.indexOf(' ');
+                       const below2Inches = allUsers.below2Inches.slice(0 , spaceIndexBelow2Inches);
+                       const spaceIndexAbove2Inche = allUsers.above2Inches.indexOf(' ');
+                       const above2Inches = allUsers.above2Inches.slice(0 , spaceIndexAbove2Inche);
+                       const spaceIndexCalves = allUsers.calves.indexOf(' ');
+                       const calves = allUsers.calves.slice(0 , spaceIndexCalves);
+                       const spaceIndexHips = allUsers.hips.indexOf(' ');
+                       const hips = allUsers.hips.slice(0 , spaceIndexHips);
+                       const spaceIndexThigh = allUsers.thigh.indexOf(' ');
+                       const thigh = allUsers.thigh.slice(0 , spaceIndexThigh);
+                       const spaceIndexArms = allUsers.arms.indexOf(' ');
+                    //    console.log('Arms >>', spaceIndexArms)
+                       const arms = allUsers.arms.slice(0 , spaceIndexArms);
+                    //    console.log('weight user >>', weight);
                         this.setState({
-                            currentDateData: true,
-                            weight: allUsers.weight,
-                            neck: allUsers.neck,
-                            shoulder: allUsers.shoulder,
-                            biceps: allUsers.biceps,
-                            chest: allUsers.chest,
-                            waistAtNaval: allUsers.waistAtNaval,
-                            below2Inches: allUsers.below2Inches,
-                            above2Inches: allUsers.above2Inches,
-                            calves: allUsers.calves,
-                            hips: allUsers.hips,
-                            thigh: allUsers.thigh,
-                            arms:allUsers.arms
+                            // currentDateData: true,
+                            arms,
+                            weight,
+                            neck,
+                            shoulder,
+                            biceps,
+                            chest,
+                            waistAtNaval,
+                            below2Inches,
+                            above2Inches,
+                            calves,
+                            hips,
+                            thigh,
                         })
-                        Alert.alert('This form will only be completed once a day');
-                    }
-                    else {
-                        // console.log('Current Date Does Not Match');
-                        this.setState({
-                            currentDateData: false
-                        })
-                    }
+                        // Alert.alert('This form will only be completed once a day');
+                    // }
+                    // else {
+                    //     // console.log('Current Date Does Not Match');
+                    //     this.setState({
+                    //         currentDateData: false
+                    //     })
+                    // }
                 }
             }
 
@@ -365,13 +396,14 @@ class LogMeasurementsScreen extends React.Component {
             chest,
             biceps,
             currentDateData,
-            arms
+            arms,
+            maxDate
         } = this.state;
-        console.log('waistAtNaval -->>', this.state.waistAtNaval,
-            'Hips -->>', this.state.hips,
-            'above', this.state.above2Inches
-        )
-        //console.log('date >>', date)
+        // console.log('waistAtNaval -->>', this.state.waistAtNaval,
+        //     'Hips -->>', this.state.hips,
+        //     'above', this.state.above2Inches
+        // )
+        console.log('date >>', date)
         return (
             <KeyboardAwareView animated={true}>
             <View style={styles.mainContainer}>
@@ -382,31 +414,38 @@ class LogMeasurementsScreen extends React.Component {
                             Measurements Log
                             </Text>
                     </View>
-
+                     <View style={styles.datePicker}> 
+                     <DatePicker
+                            style={{ width: 120 }}
+                            date={date}
+                            mode="date"
+                            placeholder="select date"
+                            format="DD-MM-YYYY"
+                            minDate="01-01-1950"
+                            maxDate={maxDate}
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            customStyles={{
+                                dateIcon: {
+                                    width: 0,
+                                    height: 0,
+                                },
+                                dateInput: {
+                                    height: 40,
+                                }
+                            }}
+                            onDateChange={(date) => { this.setState({ date}) }}
+                        />
+                     </View>
                     <Text style={styles.labelTextWeight}>Weight</Text>
-
-                    {
-                        currentDateData ?
-                            <View>
-                                <View style={styles.inputContainer}>
-                                    <Text style={styles.justTextStyle}>{weight}</Text>
-                                    {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>KG</Text></View> */}
-                                </View>
-                                <View style={styles.validationContainer}>
-                                    {weightValidation ?
-                                        <Text style={styles.validationInstruction}>Weight Required</Text>
-                                        : null}
-                                </View>
-                            </View>
-                            :
-                            <View>
                                 <View style={styles.inputContainer}>
                                     <TextInput placeholder="0"
                                         placeholderTextColor="#4f4f4f"
                                         style={styles.inputTextStyle}
                                         keyboardType={"numeric"}
                                         maxLength={7}
-                                        onChangeText={(weight) => this.setState({ weight: weight })}
+                                        value={weight}
+                                        onChangeText={(weight) => this.setState({weight})}
                                     />
                                     <View style={styles.unitTextStyle}><Text style={styles.textStyle}>KG</Text></View>
                                 </View>
@@ -415,48 +454,35 @@ class LogMeasurementsScreen extends React.Component {
                                         <Text style={styles.validationInstruction}>Weight Required</Text>
                                         : null}
                                 </View>
-                            </View>
-                    }
+                         
+                    
                     {/* <View style={{ marginTop: 20 }}></View> */}
                     <Text style={styles.labelText}>Arms</Text>
-                    {currentDateData ?
-                            <View style={styles.inputContainer}>
-                                <Text style={styles.justTextStyle}>{arms}</Text>
-                                {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                            </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
+                                value={arms}
                                 onChangeText={(arms) => this.setState({arms})}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
 
-                    }
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Neck</Text>
-                    {currentDateData ?
-                            <View style={styles.inputContainer}>
-                                <Text style={styles.justTextStyle}>{neck}</Text>
-                                {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                            </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
-                                onChangeText={(neck) => this.setState({ neck: neck })}
+                                value={neck}
+                                onChangeText={(neck) => this.setState({ neck})}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-
-                    }
                     {/* <View style={styles.validationContainer}>
                         {neckValidation ?
                             <Text style={styles.validationInstruction}>Please Enter Your Neck Value </Text>
@@ -464,23 +490,17 @@ class LogMeasurementsScreen extends React.Component {
                     </View> */}
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Shoulder</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{shoulder}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
-                                onChangeText={(shoulder) => this.setState({ shoulder: shoulder })}
+                                value={shoulder}
+                                onChangeText={(shoulder) => this.setState({ shoulder})}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
                     {/* <View style={styles.validationContainer}>
                         {shoulderValidation ?
                             <Text style={styles.validationInstruction}>Please Enter Your Shoulder Value </Text>
@@ -488,23 +508,17 @@ class LogMeasurementsScreen extends React.Component {
                     </View> */}
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Biceps</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{biceps}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
-                                onChangeText={(biceps) => this.setState({ biceps: biceps })}
+                                value={biceps}
+                                onChangeText={(biceps) => this.setState({ biceps})}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
 
                     {/* <View style={styles.validationContainer}>
                         {bicepsValidation ?
@@ -513,24 +527,18 @@ class LogMeasurementsScreen extends React.Component {
                     </View> */}
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Chest</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{chest}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
-                                onChangeText={(chest) => this.setState({ chest: chest })}
+                                value={chest}
+                                onChangeText={(chest) => this.setState({ chest})}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
 
-                    }
                     {/*                     
                     <View style={styles.validationContainer}>
                         {chestValidation ?
@@ -539,19 +547,6 @@ class LogMeasurementsScreen extends React.Component {
                     </View> */}
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Waist (At Naval)</Text>
-                    {currentDateData ?
-                    <View>
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{waistAtNaval}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        <View style={styles.validationContainer}>
-                        {waistValidation ?
-                            <Text style={styles.validationInstruction}>Waist At Naval Required </Text>
-                            : null}
-                    </View>
-                    </View>
-                        :
                         <View>
                             <View style={styles.inputContainer}>
                                 <TextInput placeholder="0"
@@ -559,6 +554,7 @@ class LogMeasurementsScreen extends React.Component {
                                     style={styles.inputTextStyle}
                                     keyboardType={"numeric"}
                                     maxLength={7}
+                                    value={waistAtNaval}
                                     onChangeText={(waist) => this.setState({ waistAtNaval: waist })}
                                 />
                                 <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
@@ -569,107 +565,75 @@ class LogMeasurementsScreen extends React.Component {
                                     : null}
                             </View>
                         </View>
-                    }
 
                     <Text style={styles.labelText}>2 Inches Above Naval</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{above2Inches}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
+                                value={above2Inches}
                                 onChangeText={(waist) => this.setState({ above2Inches: waist })}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
 
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>2 Inches Below Naval</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{below2Inches}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
+                                value={below2Inches}
                                 onChangeText={(waist) => this.setState({ below2Inches: waist })}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
 
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Hips</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{hips}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
+                                value={hips}
                                 onChangeText={(hips) => this.setState({ hips })}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
 
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Calves</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{calves}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
+                                value={calves}
                                 onChangeText={(calves) => this.setState({ calves })}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
 
                     <View style={{ marginTop: 20 }}></View>
                     <Text style={styles.labelText}>Thigh</Text>
-                    {currentDateData ?
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.justTextStyle}>{thigh}</Text>
-                            {/* <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View> */}
-                        </View>
-                        :
                         <View style={styles.inputContainer}>
                             <TextInput placeholder="0"
                                 placeholderTextColor="#4f4f4f"
                                 style={styles.inputTextStyle}
                                 keyboardType={"numeric"}
                                 maxLength={7}
-                                onChangeText={(thigh) => this.setState({ thigh: thigh })}
+                                value={thigh}
+                                onChangeText={(thigh) => this.setState({thigh})}
                             />
                             <View style={styles.unitTextStyle}><Text style={styles.textStyle}>Inches</Text></View>
                         </View>
-                    }
-
                     {/* <View style={styles.validationContainer}>
                         {thighValidation ?
                             <Text style={styles.validationInstruction}>Please Enter Your Thigh </Text>

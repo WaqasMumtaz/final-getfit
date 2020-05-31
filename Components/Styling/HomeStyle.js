@@ -6,7 +6,7 @@ const styles=StyleSheet.create({
 container:{
     flex:1,
     backgroundColor:'white',
-    marginHorizontal:20,
+    marginHorizontal:16,
 },
 headingContainer:{
     height:'8%',
@@ -123,13 +123,13 @@ cardOne:{
 },
 cardTwo:{
     // justifyContent:'flex-end',
-    height:290,
+    height:305,
     width:157,
     borderWidth:2,
     //borderColor:'white',
     borderRadius:5,
     backgroundColor:'#000000',
-    marginLeft:27
+    marginLeft:8
 },
 cardTwoTextStyle:{
     color:'#FFFFFF',
@@ -146,14 +146,14 @@ cardThree:{
     marginTop:12
 },
 cardFour:{
-    height:280,
+    height:293,
     width:157,
     //borderWidth:2,
     //borderColor:'white',
     backgroundColor:'black',
     borderRadius:5,
-    marginTop:15,
-    marginLeft:27
+    marginTop:12,
+    marginLeft:8
 },
 cardFourTextStyle:{
     color:'#FFFFFF',
@@ -177,7 +177,7 @@ bmiCard:{
     // borderColor:'black',
     borderRadius:5,
     marginTop:12,
-    marginLeft:27
+    marginLeft:8
 
 },
 bmiHeading:{
@@ -241,8 +241,8 @@ waitContainer:{
     width:152,
     // borderWidth:2,
     // borderColor:'black',
-    borderBottomLeftRadius:3,
-    borderBottomRightRadius:3,
+    borderBottomLeftRadius:5,
+    borderBottomRightRadius:5,
     //marginTop:12,
     backgroundColor:'#000000',
     padding:12

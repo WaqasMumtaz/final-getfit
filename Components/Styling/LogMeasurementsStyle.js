@@ -11,6 +11,12 @@ const styles =StyleSheet.create({
         // height:screenHight,
         //backgroundColor:'red'
     },
+    datePicker:{
+        marginTop:10,
+        flexDirection:'row',
+        justifyContent:'center',
+        alignItems:'center'
+    },
     childContainer:{
         //flex:1,
         //marginHorizontal:20,

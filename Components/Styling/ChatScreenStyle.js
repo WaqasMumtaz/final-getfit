@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         width: 200,
         height: 200,
-        resizeMode: 'contain',
+        // resizeMode: 'contain',
     },
     replymgsImges: {
         padding: 10,

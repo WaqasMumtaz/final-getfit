@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* getFitNavigateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* getFitNavigateTests.m */; };
+		043C5F34247F763200CD541E /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 043C5F33247F763100CD541E /* assets */; };
 		045E64E82463E9050065297C /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 045E64E72463E9050065297C /* HealthKit.framework */; };
 		045E64EB246401790065297C /* BHealthKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 045E64EA246401790065297C /* BHealthKit.m */; };
+		0483FFD9247E45E5009D4CC8 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0483FFD8247E45E5009D4CC8 /* CloudKit.framework */; };
 		04889F89243A51E600C6214C /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04889F88243A51E600C6214C /* libRNFS.a */; };
 		04C29FEB2440823600CB2A76 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04C29FEA2440823600CB2A76 /* GoogleService-Info.plist */; };
 		04D7D35124501A7200EDD3F7 /* MontserratExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0B953F3AE8F4611BCA7C2CB /* MontserratExtraBold.ttf */; };
@@ -56,9 +58,11 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* getFitNavigateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = getFitNavigateTests.m; sourceTree = "<group>"; };
 		037FE39B7B346618B6D999B7 /* Pods-getFitNavigate.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getFitNavigate.debug.xcconfig"; path = "Target Support Files/Pods-getFitNavigate/Pods-getFitNavigate.debug.xcconfig"; sourceTree = "<group>"; };
+		043C5F33247F763100CD541E /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
 		045E64E72463E9050065297C /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		045E64E9246401790065297C /* BHealthKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BHealthKit.h; sourceTree = "<group>"; };
 		045E64EA246401790065297C /* BHealthKit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BHealthKit.m; sourceTree = "<group>"; };
+		0483FFD8247E45E5009D4CC8 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		04889F88243A51E600C6214C /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNFS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		04C29FEA2440823600CB2A76 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		04D7DD082451AF2200490F38 /* getFitNavigateDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = getFitNavigateDebug.entitlements; path = getFitNavigate/getFitNavigateDebug.entitlements; sourceTree = "<group>"; };
@@ -103,6 +107,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0483FFD9247E45E5009D4CC8 /* CloudKit.framework in Frameworks */,
 				04F7CD38243A53F30046873D /* libDoubleConversion.a in Frameworks */,
 				045E64E82463E9050065297C /* HealthKit.framework in Frameworks */,
 				04889F89243A51E600C6214C /* libRNFS.a in Frameworks */,
@@ -167,6 +172,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0483FFD8247E45E5009D4CC8 /* CloudKit.framework */,
 				045E64E72463E9050065297C /* HealthKit.framework */,
 				04F7CD37243A53F30046873D /* libDoubleConversion.a */,
 				04889F88243A51E600C6214C /* libRNFS.a */,
@@ -190,6 +196,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				043C5F33247F763100CD541E /* assets */,
 				13B07FAE1A68108700A75B9A /* getFitNavigate */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* getFitNavigateTests */,
@@ -387,6 +394,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043C5F34247F763200CD541E /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				04C29FEB2440823600CB2A76 /* GoogleService-Info.plist in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,

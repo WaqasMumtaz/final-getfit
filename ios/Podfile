@@ -48,14 +48,13 @@ target 'getFitNavigate' do
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
 
-
-
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
 
 
   # pod 'tipsi-stripe', :path => '../node_modules/tipsi-stripe'
+
 
   target 'getFitNavigateTests' do
     inherit! :search_paths

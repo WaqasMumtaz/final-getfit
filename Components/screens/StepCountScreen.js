@@ -18,7 +18,7 @@ import { NativeModules } from 'react-native';
 import { thisExpression } from '@babel/types';
 import OverlayLoader from '../Loader/OverlaySpinner';
 //import { TextInput } from 'react-native-gesture-handler';
-const rnHealthKit = NativeModules.RNHealthKit;
+const RNHealthKit = NativeModules.RNHealthKit;
 import ToggleSwitch from 'toggle-switch-react-native';
 // Import the react-native-pedometer module
 import Fitness from '@ovalmoney/react-native-fitness';
@@ -106,9 +106,9 @@ export default class StepCountScreen extends React.Component {
 
                     GoogleFit.authorize(options)
                         .then((res) => {
-                            console.log('authorized google fit >>>', res)
+                            // console.log('authorized google fit >>>', res)
                             if (res.success) {
-                                console.log('Authorization success and run if condition ')
+                                // console.log('Authorization success and run if condition ')
                                 const option = {
                                     startDate: moment(new Date()).startOf('day').toISOString(), //ISO Time String
                                     endDate: moment(new Date()).endOf('day').toISOString()
@@ -120,15 +120,15 @@ export default class StepCountScreen extends React.Component {
 
                                 // console.log('GoogleFit >>', GoogleFit);
                                 GoogleFit.observeSteps((res)=>{
-                                    console.log('Observe History Function run')
-                                    console.log('ObserveHistory >>', res);
+                                    // console.log('Observe History Function run')
+                                    // console.log('ObserveHistory >>', res);
                                 })
 
                                 GoogleFit.getDailyStepCountSamples(option).then((res)=>{
-                                    console.log('Daily steps >>> ', res);
+                                    // console.log('Daily steps >>> ', res);
                                     res && res.map((item, index)=>{
                                         item.steps.map((item,i)=>{
-                                        console.log('Steps Value >>', item.value);
+                                        // console.log('Steps Value >>', item.value);
                                         this.setState({ pedometerData: item.value })
                                         });
                                     })
@@ -287,7 +287,7 @@ export default class StepCountScreen extends React.Component {
         this.dateFilter()
         //this.getGoalStepData();
         const paramsData = this.props.navigation.state.params;
-        console.log('params data >>>', paramsData)
+        // console.log('params data >>>', paramsData)
         this.setState({
             goalSteps: paramsData.goalSteps,
             pedometerData: paramsData.pedometerData
@@ -296,7 +296,7 @@ export default class StepCountScreen extends React.Component {
         AsyncStorage.getItem('pedometerData').then((value) => {
             if (value) {
                 //const setValue = JSON.parse(value);
-                console.log('local storage pedometer >>>', value)
+                // console.log('local storage pedometer >>>', value)
                 this.setState({
                     pedometerData: value
                 })
@@ -344,7 +344,7 @@ export default class StepCountScreen extends React.Component {
         AsyncStorage.getItem('currentUser').then((value) => {
             if (value) {
                 let dataUser = JSON.parse(value);
-                console.log(dataUser)
+                // console.log(dataUser)
                 this.setState({
                     currentUserId: dataUser._id
                 })
@@ -416,10 +416,10 @@ export default class StepCountScreen extends React.Component {
         const currentDate = new Date().getDate();
         let currentMonth = new Date().getMonth() + 1;
         const currentYear = new Date().getFullYear();
-        console.log('current week >>', currentDayOfWeek);
-        console.log('currentDate >>', currentDate);
-        console.log('currentMont >>', currentMonth);
-        console.log('currentYear >>', currentYear);
+        // console.log('current week >>', currentDayOfWeek);
+        // console.log('currentDate >>', currentDate);
+        // console.log('currentMont >>', currentMonth);
+        // console.log('currentYear >>', currentYear);
         const dataPost = {
             userId: this.state.currentUserId,
             time: this.state.curTime,
@@ -432,9 +432,9 @@ export default class StepCountScreen extends React.Component {
         }
         try {
             let postedData = await HttpUtilsFile.post('pedometer', dataPost)
-            console.log('posted data >>>', postedData)
+            // console.log('posted data >>>', postedData)
             if (postedData.code == 200) {
-                console.log('data sumbit')
+                // console.log('data sumbit')
             }
         }
         catch (err) {
@@ -445,7 +445,7 @@ export default class StepCountScreen extends React.Component {
 
     _startPedometer() {
         const { params } = this.props.navigation.state;
-        console.log('Pedometer Function function successfully Run ')
+        // console.log('Pedometer Function function successfully Run ')
         // this.setState({ tapLoad: false,})
         //this.matchTime()
         this.updateTime()
@@ -514,65 +514,17 @@ if(Platform.OS === 'android'){
         
         if (Platform.OS === 'ios') {
             console.log('IOS Stepcounter Running Successfully ')
-                        // const options = {
-                        //     scopes: [
-                        //         Scopes.FITNESS_ACTIVITY_READ_WRITE,
-                        //         Scopes.FITNESS_BODY_READ_WRITE,
-                        //     ],
-                        // }
-                        //  console.log('Health file data >>',Health);
-                        Health()
-        // SensorManager.startStepCounter(1000);
-        // DeviceEventEmitter.addListener('StepCounter', async (data) => {
-        //     console.log('sensor manager data -->>', await data)
-            // params.pedometerFun(data.steps)
-            // this.setState({ pedometerData: data.steps }, () => {
-            //     if (data.steps > Number(1)) {
-            //         //this.countStepTime()
-            //         if (this.state.eightToSixteen == true) {
-            //             this.setState({
-            //                 firstValue: data.steps
-            //             })
-            //         }
-            //         else if (this.state.sixteenTo23 == true) {
-            //             this.setState({
-            //                 secondValue: data.steps
-            //             })
-            //         }
-            //         else if (this.state.oneToEight == true) {
-            //             this.setState({
-            //                 thirdValue: data.steps
-            //             })
+            // console.log('NativeAppEventEmitter >>',NativeAppEventEmitter);
 
-            //         }
-            //         const multiplySteps = data.steps / Number(this.state.goalSteps);
-            //         //console.log('multiply >>',multiplySteps);
-            //         const divideSteps = multiplySteps * 100;
-            //         //console.log('divided >>',divideSteps )
-            //         const roundedValue = Math.round(divideSteps);
-            //         //console.log('percentage steps >>',roundedValue)
-            //         this.setState({
-            //             stepsPercentage: roundedValue
-            //         })
-
-            //     }
-            //     if (data.steps != 0 && Number(this.state.goalSteps) != 0) {
-            //         if (data.steps == Number(this.state.goalSteps)) {
-            //             console.log('steps match ')
-            //             // this.setState({
-            //             //     showButton: true
-            //             // })
-            //         }
-            //     }
-
-
-          //  })
-            // console.log('user steps -->', data.steps)
-
-
-        // });
+            // NativeAppEventEmitter.addListener(
+            //     'StepChangedEvent',(steps)=>
+            //     {
+            //       console.log('Steps ios >>', steps)
+            //     })
+                 Health()
+        
                      
-                    }
+    }
 
 
     }
@@ -610,21 +562,21 @@ if(Platform.OS === 'android'){
 
             }
             else if (currentTime < time16 || currentTime >= eightTime) {
-                console.log('8 to 16 time condition')
+                // console.log('8 to 16 time condition')
                 this.setState({
                     eightToSixteen: true
                 })
             }
             
             else if (currentTime < time23 || currentTime >= time16) {
-                console.log('16 to 23 Condition Successfully run');
+                // console.log('16 to 23 Condition Successfully run');
                 this.setState({
                     sixteenTo23: true
                 })
             }
             
             else if ((currentTime == time1 || currentTime < eightTime)) {
-                console.log('1 to 8 Condition Successfully run');
+                // console.log('1 to 8 Condition Successfully run');
                 this.setState({
                     oneToEight: true
                 })

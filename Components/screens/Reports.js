@@ -6,8 +6,17 @@ import ChartScreen from '../BarChart/BarChart';
 import HttpUtils from '../Services/HttpUtils';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from "moment";
+import {
+  DeviceEventEmitter // will emit events that you can listen to
+} from 'react-native';
+import { NativeAppEventEmitter } from 'react-native';
+import { SensorManager } from 'NativeModules';
+import Health from '../counter/health.ios';
 
 const { height } = Dimensions.get('window');
+
+let initialValue = Number(0)
+
 
 class Reportscreen extends React.Component {
   static navigationOptions = {
@@ -33,7 +42,9 @@ class Reportscreen extends React.Component {
       goalSteps: '',
       goalStepsDate: '',
       currentWeekWeight:false,
-      lastWeekWeight:false
+      lastWeekWeight:false,
+      stepsPercentage:'',
+      pedometerData:''
 
     }
   }
@@ -42,15 +53,65 @@ class Reportscreen extends React.Component {
     // console.log('componentWillMount Run ')
    const dateTo = moment().format('YYYY-MM-DD');
    const dateFrom = moment().subtract(7,'d').format('YYYY-MM-DD');
-   console.log('Date To >>', dateTo);
-   console.log('DateFrom >>', dateFrom);
+  //  console.log('Date To >>', dateTo);
+  //  console.log('DateFrom >>', dateFrom);
+  }
+
+  componentDidMount(){
+    if(Platform.OS === 'android'){
+      // HealthAndroid()
+      SensorManager.startStepCounter(1000);
+          DeviceEventEmitter.addListener('StepCounter', (data) => {
+              // console.log('sensor manager data -->>', data)
+              this.setState({ pedometerData: data.steps }, () => {
+                  if (data.steps > Number(1)) {
+                      const multiplySteps = data.steps / Number(initialValue);
+                      //console.log('multiply >>',multiplySteps);
+                      const divideSteps = multiplySteps * 100;
+                      //console.log('divided >>',divideSteps )
+                      const roundedValue = Math.round(divideSteps);
+                      //console.log('percentage steps >>',roundedValue)
+                      this.setState({
+                          stepsPercentage: roundedValue
+                      })
+  
+                  }
+                  // if (data.steps != 0 && Number(this.state.goalSteps) != 0) {
+                  //     if (data.steps == Number(this.state.goalSteps)) {
+                  //         console.log('steps match ')
+                  //         // this.setState({
+                  //         //     showButton: true
+                  //         // })
+                  //     }
+                  // }
+  
+  
+              })
+              // console.log('user steps -->', data.steps)
+  
+  
+          });
+  
+  }
+          
+          if (Platform.OS === 'ios') {
+              console.log('IOS Stepcounter Running Successfully ')
+                          //  Health()
+                          NativeAppEventEmitter.addListener(
+                            'StepChangedEvent',(steps)=>
+                            {
+                              console.log('Steps ios >>', steps)
+                            })
+                             
+                  
+          }  
   }
 
   getDaysData = () => {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener('didFocus', () => {
       // BackHandler.addEventListener("hardwareBackPress", this.onBack)
-      console.log('Running Successfully Add Listener Function')
+      // console.log('Running Successfully Add Listener Function')
       this.getData();
     })
   }
@@ -82,10 +143,10 @@ class Reportscreen extends React.Component {
     };
     // console.log('user id >>', userObj)
     let userPedometerData = await HttpUtils.post('getpedometerbyid', userObj);
-     console.log('user get pedometer data >>', userPedometerData);
+    //  console.log('user get pedometer data >>', userPedometerData);
     let retrieveGoalSteps = await HttpUtils.post('getgoal', userObj);
 
-     console.log('retrieveGoalSteps >>',retrieveGoalSteps);
+    //  console.log('retrieveGoalSteps >>',retrieveGoalSteps);
 
     if (userPedometerData.code == 200 && retrieveGoalSteps.code == 200) {
       const userContent = userPedometerData.content;
@@ -114,7 +175,7 @@ class Reportscreen extends React.Component {
     let weightData = dataWeight.content;
     let userGoalSteps = retrieveGoalSteps.content;
     let userPedometerDataSteps = userPedometerData.content
-    console.log('User GoalSteps >>', userGoalSteps)
+    // console.log('User GoalSteps >>', userGoalSteps)
 
     //gettibg curent date
     const currentDayOfWeek = new Date().getDay() + 1;
@@ -328,25 +389,25 @@ class Reportscreen extends React.Component {
           var sevenDaysAgo = moment().subtract(dayCount, 'days').toDate();
           // console.log('SevenDaysAgo Data >>', sevenDaysAgo);
           var dayOfMonthAgo = sevenDaysAgo.getDate() + 1;
-           console.log('dayOfMonthAgo >>', dayOfMonthAgo);
+          //  console.log('dayOfMonthAgo >>', dayOfMonthAgo);
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
-           console.log('Month No of Year >>', monthNoOfYear);
+          //  console.log('Month No of Year >>', monthNoOfYear);
           var monthFinde = Number(dataApi.month) - monthNoOfYear
-            console.log('monthNoOf Finder >>', monthFinde);
+            // console.log('monthNoOf Finder >>', monthFinde);
            var yearNo = sevenDaysAgo.getFullYear();
            dayCount--;
           //  console.log('L numbers >>', l);
         if (l == 7){
           const weekBefore1 = Math.abs(dayOfMonthAgo - 1);
-          console.log('WeeBefore1 >>', weekBefore1)
+          // console.log('WeeBefore1 >>', weekBefore1)
           const weekBefore2 = Math.abs(dayOfMonthAgo - 2);
           const weekBefore3 = Math.abs(dayOfMonthAgo - 3);
           const weekBefore4 = Math.abs(dayOfMonthAgo - 4);
           const weekBefore5 = Math.abs(dayOfMonthAgo - 5);
           const weekBefore6 = Math.abs(dayOfMonthAgo - 6);
-          console.log('WeeBefore6 >>', weekBefore6)
+          // console.log('WeeBefore6 >>', weekBefore6)
           const weekBefore7 = Math.abs(dayOfMonthAgo - 7);
-          console.log('WeekBefore DAta >>',weekBefore)
+          // console.log('WeekBefore DAta >>',weekBefore)
           if(weekBefore1 == Number(dataApi.dayOfMonth)
            || weekBefore2 == Number(dataApi.dayOfMonth)
            || weekBefore3 == Number(dataApi.dayOfMonth)
@@ -374,7 +435,7 @@ class Reportscreen extends React.Component {
             && yearNo == Number(dataApi.year)) {
           // console.log(currentDateDataWeights)
           cureentWeekData = dataApi,
-          console.log('CurrentWeekData >>', cureentWeekData);
+          // console.log('CurrentWeekData >>', cureentWeekData);
           this.setState({
             currentDateDataWeights: cureentWeekData,
             currentWeekWeight:true,
@@ -396,7 +457,7 @@ class Reportscreen extends React.Component {
       let weekAgoWieght = weekBefore.weight.substring(0, weekBefore.weight.length - 2);
       let currentWeekWieght = cureentWeekData.weight.substring(0, cureentWeekData.weight.length - 2);
       loseWeight = weekAgoWieght - currentWeekWieght;
-      console.log('loseWeight >>', loseWeight);
+      // console.log('loseWeight >>', loseWeight);
     }
     //lose weight
     if (loseWeight > 0) {
@@ -444,14 +505,15 @@ class Reportscreen extends React.Component {
       weekAgoDateDataGoalSteps,
       weekAgoDateDataRunSteps,
       currentWeekWeight,
-      lastWeekWeight
+      lastWeekWeight,
+      stepsPercentage,
+      pedometerData
     } = this.state
-    console.log(loseWeight, 'loseWeight')
-    let initialValue = Number(0)
+    // console.log(loseWeight, 'loseWeight')
     weekAgoDateDataGoalSteps && weekAgoDateDataGoalSteps.map((item, index) => {
       return initialValue = initialValue + Number(item);
     })
-    console.log('Total Steps >>', initialValue);
+    // console.log('Total Steps >>', initialValue);
     let runSteps = Number(0);
     weekAgoDateDataRunSteps && weekAgoDateDataRunSteps.map((item, index) => {
       return runSteps = runSteps + Number(item)
@@ -517,19 +579,20 @@ class Reportscreen extends React.Component {
                     size={65}
                     width={10}
                     color={'#FF6200'}
-                    progress={runSteps > 1 && runSteps < 250 ? 25 :
-                      runSteps > 250 && runSteps < 500 ? 50 :
-                      runSteps > 500 && runSteps < 750 ? 75 :
-                      runSteps > 750 && runSteps <= 10000 ? 100
-                            : 0
-                    }
+                    // progress={runSteps > 1 && runSteps < 250 ? 25 :
+                    //   runSteps > 250 && runSteps < 500 ? 50 :
+                    //   runSteps > 500 && runSteps < 750 ? 75 :
+                    //   runSteps > 750 && runSteps <= 10000 ? 100
+                    //         : 0
+                    // }
+                    progress={stepsPercentage == '' ? 0 : stepsPercentage}
                     backgroundColor={'gray'}
                     animateFromValue={0}
                     fullColor={'#FF6200'}
                   />
                 </View>
                 <View style={styles.resultContainer}>
-                  <Text style={{ color: '#FF6200' }}>{runSteps == 0 ? 0 : runSteps}</Text>
+                  <Text style={{ color: '#FF6200' }}>{pedometerData == 0 ? 0 : pedometerData}</Text>
                   <Text style={{ color: '#a6a6a6' }}>/{initialValue == 0 ? 0 : initialValue}</Text>
                 </View>
                 <Text style={{ color: '#a6a6a6', marginLeft: 14 }}>steps</Text>

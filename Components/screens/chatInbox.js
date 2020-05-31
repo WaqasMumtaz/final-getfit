@@ -23,6 +23,7 @@ const db = firebase.database();
 
 let counter = 0;
 let userNamesData = [];
+
 class ChatInbox extends React.Component {
     constructor(props) {
         super(props);
@@ -33,27 +34,36 @@ class ChatInbox extends React.Component {
             userEmail: '',
             userNumber: '',
             chatMessages: '',
-            opponentId: ''
+            opponentId: '',
+            currentUserId: '',
+            newMessage:[]
         }
         this.checkTrainy()
     }
-   
 
-    getUsersData= async ()=>{
+
+    async componentWillMount() {
         let userData;
         let userNamesData = [];
         let userMessages = [];
-        // let dataFromLocalStorage;
         let userDataWithMesg = [];
         let sentArray = [];
+        let currentUserId;
+        await AsyncStorage.getItem("currentUser").then(value => {
+            let localStorageData = JSON.parse(value);
+            currentUserId = localStorageData._id;
+             
+         })
+
+        // console.log('Will Mount User Id >>', currentUserId);
         await AsyncStorage.getItem('opponentProfile').then((value) => {
             userData = JSON.parse(value);
             // userData.count = 0;
-             console.log('Asyncstorage >>',userData);
+            //  console.log('Asyncstorage >>',userData);
 
         })
-        
-        console.log('opponent data chatbox >>>', userData)
+
+        // console.log('opponent data chatbox >>>', userData)
         await db.ref('users').on("value", snapshot => {
             let data = snapshot.val();
             // console.log('data snapshot >>', data)
@@ -74,46 +84,79 @@ class ChatInbox extends React.Component {
             //  console.log('UserNames Data >>',userNamesData)
             this.setState({
                 messageUser: userNamesData
-            },()=>this.getUserMgsCountAndStatusChanged())
+            })
             userNamesData = [];
         });
-    
-    }
-
-    getUserMgsCountAndStatusChanged = async ()=>{
-        const {messageUser} = this.state
-        let dataFromLocalStorage;
-        await AsyncStorage.getItem("currentUser").then(value => {
-            if (value) {
-                dataFromLocalStorage = JSON.parse(value);
-            }
-        })
-       await db.ref('chatRoom').on("value", snapshot => {
+         db.ref('chatRoom').on("value", snapshot => {
+            // var countNmber = 0;
             let data = snapshot.val();
-          //  console.log(data , 'data')
-            for (var i in messageUser) {
-                let userAllData = messageUser[i];
-//console.log(userAllData , 'user all data')
-               for (var j in data) {
-                //   console.log(data[j] , 'message')
-                     let firbaseData = data[j];
-             if(firbaseData.reciverId == dataFromLocalStorage._id && firbaseData.senderId == userAllData.userId){
+            //  const { messageUser } = this.state;
+            //  console.log('User DAta >>', userData);
+            // console.log('Current User id >>', currentUserId);
+            //  console.log(data , 'data')
+            for (var i in userData) {
+                let userAllData = userData[i];
+                //  console.log(userAllData , 'user all data')
+                for (var j in data) {
+                    //   console.log(data[j] , 'message')
+                    let firbaseData = data[j];
                     
-               }
-                
-        }
+                    if (firbaseData.reciverId == currentUserId && firbaseData.senderId == userAllData.userId) {
+                        //   console.log('User Conversation ', firbaseData);
+                        if (firbaseData.type == 'text' && firbaseData.status == 'sent') {
+                            let sentMsgsArray =[];
+                            // userAllData.msgStatus = firbaseData.status;
+                            userAllData.message = firbaseData.message
+                            // sentMsgsArray.push(firbaseData)
+                            // console.log('Firebase Sent Array >>', sentMsgsArray)
+                            // let lengthOfSents = sentMsgsArray.length;
+                            // userAllData.sentsMessageLength = lengthOfSents
+                            userData.push(userAllData)
+                            // console.log('All Sents Messages Length >>', userData);
+                            
 
+                        }
+                        // else if(firbaseData.status == 'sent'){
+                        // //    sentMsgsArray.push(firbaseData.status);
+                        //    countNmber += 1;
+                        //    console.log("testzaid",countNumber)
+        
+
+                        // //    console.log('Sent Messages array >>', a);
+                        // }
+                        else if (firbaseData.type == 'image' && firbaseData.status == 'sent') {
+                            userAllData.msgStatus = firbaseData.status;
+                            userAllData.message == 'Photo'
+                            userData.push(userAllData)
+                        }
+                    }
+                    
+                    if (firbaseData.senderId == currentUserId && firbaseData.reciverId == userAllData.userId) {
+                        //    console.log('User Conversation >>', firbaseData);
+                        if (firbaseData.type == 'text') {
+                            userAllData.message = firbaseData.message
+                            userData.push(userAllData)
+                        }
+                        else if (firbaseData.type == 'image') {
+                            userAllData.message = 'Photo'
+                            userData.push(userAllData)
+                        }
+                    }
+                   
+                }
+    
+            }
+         })
+
+       
     }
-       })
 
+    getUserData=()=>{
+        
     }
 
-   async componentWillMount() {
-         await this.getUsersData()
-         
-        // console.log(userNamesData, 'userNamesData')
 
-    }
+
 
     componentWillUnmount() {
         // Remove the event listener
@@ -164,7 +207,6 @@ class ChatInbox extends React.Component {
         const { navigate } = this.props.navigation;
         navigate('ChatBox', {
             senderData: userData,
-            'counterFunc': (data) => this.countMsgs(data)
         });
     }
 
@@ -184,23 +226,15 @@ class ChatInbox extends React.Component {
     }
 
 
-
     render() {
-        const { messageUser, opponentId, forTrainnerModal, userEmail, currentName, userNumber } = this.state;
-        console.log('state user message >>>', messageUser)
+        const { messageUser, newMessage,opponentId, forTrainnerModal, userEmail, currentName, userNumber } = this.state;
+        //  console.log('state user message >>>', messageUser)
         // console.log('email >', userEmail, 'name >', currentName, 'number', userNumber)
+        //hello zaid ye nahi kar rha dekh karna ye hy k jitnay b sent waly mesg pary hny 
+        //unko add karna hy ? han samjah gaya acha ye dekh 
+       // const countNmber = 0;
         const senderName = messageUser && messageUser.map((elem, key) => {
-            // elem.mesg = 'my first mesg'
-             console.log('Messages user >>', elem);
-             console.log('Sender Status >>', elem.mesg);
-            if (elem.userId == opponentId) {
-                // console.log('Sents msgs >>', elem.status);
-                // console.log('jis user ko msg kiey hny  >>', elem.mesg);
-                // console.log('Our uska name >>', elem.name);
-                // console.log('Congrates User Find Specific');
-                // elem.count += elem.count;
-                // console.log('Count Message >>', elem.count);
-            }
+                // console.log('All sents length >>', elem.sentsMessageLength);
             return (
                 <View style={styles.nameContainer}>
                     {elem.image != undefined ?
@@ -210,7 +244,7 @@ class ChatInbox extends React.Component {
                     }
                     <TouchableOpacity style={styles.nameOpacity} onPress={this.sendOppentUserData.bind(this, elem)}>
                         <Text style={styles.name}>{elem.name}</Text>
-                        <Text style={{ color: 'red' }}>{elem.mesg}</Text>
+                        <Text style={{ color: 'gray', fontSize:12}}>{elem.message}</Text>
                     </TouchableOpacity>
 
                     {elem.status == 'Online' ?

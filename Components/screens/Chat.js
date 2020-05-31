@@ -11,7 +11,8 @@ import {
   Image,
   Dimensions,
   AsyncStorage,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
 // import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -28,6 +29,10 @@ import ChartScreen from '../BarChart/BarChart';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { YellowBox } from 'react-native';
 import firebasePushNotification from 'react-native-firebase';
+import DocumentPicker from 'react-native-document-picker';
+// import RNFetchBlob from 'rn-fetch-blob';
+
+var logo  = require('../icons/logo.png');
 
 
 YellowBox.ignoreWarnings([
@@ -89,6 +94,7 @@ class Chatscreen extends React.Component {
       senderData: '',
       isLoading: false,
       fileUpLoading: false,
+      imgLoading:false,
       forVideoModal: false,
       smallVideo: true,
       largeSizeVideo: false,
@@ -100,6 +106,8 @@ class Chatscreen extends React.Component {
       chatDates: [],
       chatMonths: [],
       chatYear: [],
+      errorMessg:'',
+      alertError:false
       // yesterdayDate: '',
       // deviceToken: '',
       // userToken: ''
@@ -129,9 +137,9 @@ class Chatscreen extends React.Component {
     this.createNotificationListeners();
   }
   componentWillMount() {
-    const { senderData, read } = this.props.navigation.state.params;
-    console.log('WillMount Data Read >>', read);
-    console.log('Sender Data >>', senderData);
+    const { senderData } = this.props.navigation.state.params;
+    // console.log('WillMount Data Read >>', read);
+     console.log('Sender Data >>', senderData);
     let chatArrayTemp = [];
     let dataFromLocalStorage;
     const hours = new Date().getHours();
@@ -190,21 +198,13 @@ class Chatscreen extends React.Component {
             // console.log('Firebase Database >>', firbaseData);
             if (firbaseData.reciverId == dataFromLocalStorage._id && firbaseData.senderId == senderData.userId) {
               chatArrayTemp.push(firbaseData);
+              console.log('Chat Array >>', chatArrayTemp);
             }
             if (firbaseData.senderId == dataFromLocalStorage._id && firbaseData.reciverId == senderData.userId) {
               chatArrayTemp.push(firbaseData);
+              console.log('Chat Array >>', chatArrayTemp);
+              
             }
-            // console.log('Chat Array Message .>', chatArrayTemp)
-            // if(firbaseData.reciverId == senderData.userId){
-            //   console.log('User jisko message recieved howa hy ');
-            //   for(let j in chatArrayTemp){
-            //     // console.log('J Loop >>', chatArrayTemp[j]);
-            //     const arrayData = chatArrayTemp[j];
-            //     arrayData.read = true;
-            //     console.log('Array Data >>', arrayData);
-            //     // chatArrayTemp.push(arrayData)
-            //   }
-            // }
           }
           this.setState({
             userId: dataFromLocalStorage._id,
@@ -264,7 +264,7 @@ class Chatscreen extends React.Component {
             data: {
               custom_notification: {
                 title: "New Message",
-                body: userMessage,
+                body: userMessage.type == 'text' ? userMessage : 'Sent an attachment',
               }
             },
           };
@@ -298,7 +298,7 @@ class Chatscreen extends React.Component {
             data: {
               custom_notification: {
                 title: "New Message",
-                body: userMessage,
+                body: userMessage.type == 'text' ? userMessage : 'Sent an attachment',
               }
             },
           };
@@ -337,73 +337,248 @@ class Chatscreen extends React.Component {
       noData: true,
       mediaType: 'photo'
     }
-    ImagePicker.showImagePicker(options, async (response) => {
-      if (response.didCancel) {
-        //console.log('User cancelled image picker');
-      }
-      else if (response.error) {
-        //console.log('ImagePicker Error: ', response.error);
-      }
-      else if (response.customButton) {
-        //console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
-        let timestamp = (Date.now() / 1000 | 0).toString();
-        let api_key = '878178936665133'
-        let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
-        let cloud = 'dxk0bmtei'
-        let hash_string = 'timestamp=' + timestamp + api_secret
-        let signature = CryptoJS.SHA1(hash_string).toString();
-        let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload'
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', upload_url);
-        xhr.onload = () => {
-          let uploadData = JSON.parse(xhr._response)
-          this.uplaodDataOnFirebase(uploadData, 'image')
-        };
-        let formdata = new FormData();
-        formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
-        formdata.append('timestamp', timestamp);
-        formdata.append('api_key', api_key);
-        formdata.append('signature', signature);
-        xhr.send(formdata);
-        // You can also display the image using data:
-        this.setState({
-          attachOrange: true,
-          shareFiles: true
-        });
-      }
-    })
+    if (Platform.OS === 'android') {
+      ImagePicker.showImagePicker(options, async (response) => {
+        if (response.didCancel) {
+          //console.log('User cancelled image picker');
+        }
+        else if (response.error) {
+          //console.log('ImagePicker Error: ', response.error);
+        }
+        else if (response.customButton) {
+          //console.log('User tapped custom button: ', response.customButton);
+        }
+        else {
+          console.log('Image Local url >>', response.uri);
+          this.setState({
+            isLoading:true,
+            imgLoading:true
+          })
+          let timestamp = (Date.now() / 1000 | 0).toString();
+          let api_key = '878178936665133'
+          let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
+          let cloud = 'dxk0bmtei'
+          let hash_string = 'timestamp=' + timestamp + api_secret
+          let signature = CryptoJS.SHA1(hash_string).toString();
+          let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
+          console.log('Upload URL >>', upload_url);
+          let xhr = new XMLHttpRequest();
+          xhr.open('POST', upload_url);
+          xhr.onload = () => {
+            let uploadData = JSON.parse(xhr._response)
+            let userImgUrl = uploadData.secure_url;
+            // console.log('User Android imgurl >>', userImgUrl);
+            this.uplaodDataOnFirebase(uploadData, 'image');
+            this.setState({
+              isLoading:false,
+              imgLoading:false
+            })
+          };
+          let formdata = new FormData();
+          formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
+          formdata.append('timestamp', timestamp);
+          formdata.append('api_key', api_key);
+          formdata.append('signature', signature);
+          xhr.send(formdata);
+          // You can also display the image using data:
+          this.setState({
+            attachOrange: true,
+            shareFiles: true
+          });
+        }
+      })
+    }
+    else if (Platform.OS === 'ios') {
+      ImagePicker.showImagePicker(options, (response) => {
+        if (response.didCancel) {
+          //console.log('User cancelled image picker');
+        }
+        else if (response.error) {
+          //console.log('ImagePicker Error: ', response.error);
+        }
+        else if (response.customButton) {
+          //console.log('User tapped custom button: ', response.customButton);
+        }
+        else {
+          console.log('Image Local file >>', response.uri);
+          
+         
+          let timestamp = (Date.now() / 1000 | 0).toString();
+          let api_key = '878178936665133'
+          let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
+          let cloud = 'dxk0bmtei'
+          let myPresetKey = 'wtoutud8';
+          let secndPresetKey = 'toh6r3p2'
+          let hash_string = 'timestamp=' + timestamp + api_secret
+          let signature = CryptoJS.SHA1(hash_string).toString();
+          // console.log('Signature >>', signature);
+          let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
+          //  console.log('Upload URL >>', upload_url);
+          let xhr = new XMLHttpRequest();
+         
+          // console.log('XHR Url >>', xhr);
+          xhr.open('POST', upload_url);
+          xhr.onload = () => {
+            let uploadData = JSON.parse(xhr._response)
+            console.log('UploadDAta >>', uploadData);
+            console.log('Upload Imag Error >>', uploadData.error);
+             if(uploadData.error){
+                Alert.alert(`${uploadData.error.message}`)
+              }
+              else {
+                 this.uplaodDataOnFirebase(uploadData, 'image');
+
+              }
+            // if(uploadData){
+            //   this.setState({
+            //     isLoading:false,
+            //     imgLoading:false
+            //   },()=>{
+            //     console.log('If Condition Callback >>', uploadData.error)
+            //     if(uploadData.error){
+            //     Alert.alert(`${uploadData.error.message}`);
+            //     this.setState({
+            //       isLoading:false,
+            //       imgLoading:false
+            //     })
+            //   }
+
+            //   })
+            //   // if(uploadData.error){
+            //   //   Alert.alert(`${uploadData.error.message}`)
+            //   // }
+            // }
+            // if(uploadData.error){
+            //     Alert.alert(`${uploadData.error.message}`)
+            // }
+              // if(uploadData && !uploadData.error) {
+              //   this.setState({
+              //     isLoading:false,
+              //     imgLoading:false
+              //   },()=>{
+              //       this.uplaodDataOnFirebase(uploadData, 'image');
+              //   })
+              // }
+            
+           
+            
+            // if(uploadData.error){
+            //   this.setState({
+            //     isLoading:false,
+            //     imgLoading:false
+            //   })
+            //   Alert.alert(`${uploadData.error.message}`)
+            // }
+            // else {
+            //   console.log('UploadDAta >>', uploadData);
+            //   this.uplaodDataOnFirebase(uploadData, 'image');
+            //   this.setState({
+            //     isLoading:false,
+            //     imgLoading:false
+            //   })
+            // }
+          };
+         
+          let formdata = new FormData();
+          formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
+          formdata.append('timestamp', timestamp);
+          formdata.append('api_key', api_key);
+          formdata.append('signature', signature);
+          xhr.send(formdata);
+
+          this.setState({
+            attachOrange: true,
+            shareFiles: true
+          });
+        }
+      })
+    }
   }
+
+  // upLoadFile=(file)=>{
+  //   console.log('UploadFile Function >>', file)
+  //   let cloud = 'dxk0bmtei'
+  //   let myPresetKey = 'wtoutud8';
+  //   let secndPresetKey = 'toh6r3p2';
+  //   RNFetchBlob.fetch('POST', 'https://api.cloudinary.com/v1_1/' + cloud + '/image/upload?upload_preset=' + myPresetKey, {
+  //     'Content-Type': 'multipart/form-data'
+  //       }, [
+  //         { name: 'file', filename: file.fileName, data: RNFetchBlob.wrap(file.origURL),
+  //        }
+  //     ])
+
+  // }
 
   fileUpload = async (e) => {
     const options = {
       noData: true,
       mediaType: 'file'
     }
-    FilePickerManager.showFilePicker(options, async (response) => {
-      if (response.didCancel) {
-        //console.log('User cancelled file picker');
-      }
-      else if (response.error) {
-        //console.log('FilePickerManager Error: ', response.error);
-      }
-      else {
-        this.setState({
-          isLoading: true,
-          fileUpLoading: true
-        })
+    if (Platform.OS === 'android') {
+      FilePickerManager.showFilePicker(options, async (response) => {
+        if (response.didCancel) {
+          //console.log('User cancelled file picker');
+        }
+        else if (response.error) {
+          //console.log('FilePickerManager Error: ', response.error);
+        }
+        else {
+          this.setState({
+            isLoading: true,
+            fileUpLoading: true
+          })
+          let timestamp = (Date.now() / 1000 | 0).toString();
+          let api_key = '878178936665133'
+          let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
+          let cloud = 'dxk0bmtei'
+          let hash_string = 'timestamp=' + timestamp + api_secret
+          let signature = CryptoJS.SHA1(hash_string).toString();
+          let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
+          let xhr = new XMLHttpRequest();
+          xhr.open('POST', upload_url);
+          xhr.onload = () => {
+            let type = response.path.substring(response.path.lastIndexOf(".") + 1);
+            let uploadData = JSON.parse(xhr._response)
+            this.uplaodDataOnFirebase(uploadData, type)
+            if (uploadData) {
+              this.setState({
+                isLoading: false,
+                fileUpLoading: false
+              })
+            }
+          };
+          let formdata = new FormData();
+          formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
+          formdata.append('timestamp', timestamp);
+          formdata.append('api_key', api_key);
+          formdata.append('signature', signature);
+          xhr.send(formdata);
+        }
+      });
+    }
+    else if (Platform.OS === 'ios') {
+      // Pick a single file
+      try {
+        const res = await DocumentPicker.pick({
+          type: [DocumentPicker.types.allFiles],
+        });
+        console.log('File Response >>',
+          res.uri,
+          res.type, // mime type
+          res.name,
+          res.size
+        );
         let timestamp = (Date.now() / 1000 | 0).toString();
         let api_key = '878178936665133'
         let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
         let cloud = 'dxk0bmtei'
         let hash_string = 'timestamp=' + timestamp + api_secret
         let signature = CryptoJS.SHA1(hash_string).toString();
-        let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload'
+        let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
         let xhr = new XMLHttpRequest();
         xhr.open('POST', upload_url);
         xhr.onload = () => {
-          let type = response.path.substring(response.path.lastIndexOf(".") + 1);
+          let type = res.uri.substring(res.uri.lastIndexOf(".") + 1);
           let uploadData = JSON.parse(xhr._response)
           this.uplaodDataOnFirebase(uploadData, type)
           if (uploadData) {
@@ -414,13 +589,20 @@ class Chatscreen extends React.Component {
           }
         };
         let formdata = new FormData();
-        formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
+        formdata.append('file', { uri: res.uri, type: res.type, name: res.name });
         formdata.append('timestamp', timestamp);
         formdata.append('api_key', api_key);
         formdata.append('signature', signature);
         xhr.send(formdata);
+      } catch (err) {
+        if (DocumentPicker.isCancel(err)) {
+          // User cancelled the picker, exit any dialogs or menus and move on
+        } else {
+          throw err;
+        }
       }
-    });
+    }
+
   }
 
   weeklyReport = () => {
@@ -441,6 +623,7 @@ class Chatscreen extends React.Component {
   }
 
   expandImg = (e) => {
+    console.log('Expand Uri >>', e)
     this.setState({
       expand: true,
       isVisibleModal: true,
@@ -744,6 +927,16 @@ class Chatscreen extends React.Component {
     let showDate;
     // console.log('image path >>', imagePath)
 
+    //let userImg;
+    // AsyncStorage.getItem('userSendImg').then(value =>{
+    //   JSON.parse(value);
+    // })
+    // AsyncStorage.getItem("userSendImg").then(value => {
+    //   if (value) {
+    //     userImg = JSON.parse(value);
+    //   console.log('User Image LocalStorage >>', userImg);
+    //   }
+    // });
     const chatMessages = this.state.chatMessages.map((message, key) => {
       // console.log('chat messages array show >>',message);
       // const a = Number(counter)+1;
@@ -796,7 +989,7 @@ class Chatscreen extends React.Component {
               <View style={styles.timeAndCheck}>
                 <Text style={styles.timeText}>{message.time}</Text>
                 {message.status == 'sent' ?
-                  <View style={{marginLeft:5}}>
+                  <View style={{ marginLeft: 5 }}>
                     <Text style={{ color: '#A6A6A6' }}>_/</Text>
                   </View>
                   : null
@@ -809,14 +1002,17 @@ class Chatscreen extends React.Component {
                 style={styles.showPhotoContainer}
                 onPress={this.expandImg.bind(this, message.message.secure_url)}
               >
+                {/* {console.log('message image >>', message.message)} */}
+                
                 <Image key={key} style={styles.mgsImges} source={{
-                  uri: `${message.message.secure_url}`
-                }} />
+                  uri:`${message.message.secure_url}`
+                }
+                } />
                 {/* <Text style={styles.timeText}>{message.time}</Text> */}
                 <View style={styles.timeAndCheck}>
                   <Text style={styles.timeText}>{message.time}</Text>
                   {message.status == 'sent' ?
-                    <View style={{marginLeft:5}}>
+                    <View style={{ marginLeft: 5 }}>
                       <Text style={{ color: '#A6A6A6' }}>_/</Text>
                     </View>
                     : null
@@ -845,7 +1041,7 @@ class Chatscreen extends React.Component {
                   <View style={styles.timeAndCheck}>
                     <Text style={styles.timeText}>{message.time}</Text>
                     {message.status == 'sent' ?
-                      <View style={{marginLeft:5}}>
+                      <View style={{ marginLeft: 5 }}>
                         <Text style={{ color: '#A6A6A6' }}>_/</Text>
                       </View>
                       : null
@@ -886,7 +1082,7 @@ class Chatscreen extends React.Component {
                         <View style={styles.timeAndCheck}>
                           <Text style={styles.timeText}>{message.time}</Text>
                           {message.status == 'sent' ?
-                            <View style={{marginLeft:5}}>
+                            <View style={{ marginLeft: 5 }}>
                               <Text style={{ color: '#A6A6A6' }}>_/</Text>
                             </View>
                             : null
@@ -911,7 +1107,7 @@ class Chatscreen extends React.Component {
                           <View style={styles.timeAndCheck}>
                             <Text style={styles.timeText}>{message.time}</Text>
                             {message.status == 'sent' ?
-                              <View style={{marginLeft:5}}>
+                              <View style={{ marginLeft: 5 }}>
                                 <Text style={{ color: '#A6A6A6' }}>_/</Text>
                               </View>
                               : null
@@ -936,7 +1132,7 @@ class Chatscreen extends React.Component {
                             <View style={styles.timeAndCheck}>
                               <Text style={styles.timeText}>{message.time}</Text>
                               {message.status == 'sent' ?
-                                <View style={{marginLeft:5}}>
+                                <View style={{ marginLeft: 5 }}>
                                   <Text style={{ color: '#A6A6A6' }}>_/</Text>
                                 </View>
                                 : null
@@ -963,7 +1159,7 @@ class Chatscreen extends React.Component {
                             <View style={styles.timeAndCheck}>
                               <Text style={styles.timeText}>{message.time}</Text>
                               {message.status == 'sent' ?
-                                <View style={{marginLeft:5}}>
+                                <View style={{ marginLeft: 5 }}>
                                   <Text style={{ color: '#A6A6A6' }}>_/</Text>
                                 </View>
                                 : null
@@ -987,7 +1183,7 @@ class Chatscreen extends React.Component {
                               <View style={styles.timeAndCheck}>
                                 <Text style={styles.timeText}>{message.time}</Text>
                                 {message.status == 'sent' ?
-                                  <View style={{marginLeft:5}}>
+                                  <View style={{ marginLeft: 5 }}>
                                     <Text style={{ color: '#A6A6A6' }}>_/</Text>
                                   </View>
                                   : null
@@ -1066,7 +1262,7 @@ class Chatscreen extends React.Component {
                                 <View style={styles.timeAndCheck}>
                                   <Text style={styles.timeText}>{message.time}</Text>
                                   {message.status == 'sent' ?
-                                    <View style={{marginLeft:5}}>
+                                    <View style={{ marginLeft: 5 }}>
                                       <Text style={{ color: '#A6A6A6' }}>_/</Text>
                                     </View>
                                     : null
@@ -1312,6 +1508,11 @@ class Chatscreen extends React.Component {
                 {recodringBody && <View style={styles.recordingContainer}>
                 </View>}
                 {chatMessages}
+                {/* {this.state.alertError ? 
+                 <View>
+                   
+                 </View> 
+               } */}
                 {expand ?
                   <Modal
                     isVisible={this.state.isVisibleModal}
@@ -1379,6 +1580,21 @@ class Chatscreen extends React.Component {
                   visible={this.state.fileUpLoading}
                   //Text with the Spinner 
                   textContent={'File Loading...'}
+                  //Text style of the Spinner Text
+                  textStyle={styles.spinnerTextStyle}
+                  color={'#FF6200'}
+
+                />
+              </View>
+              : null
+            }
+            {this.state.isLoading == true ?
+              <View style={styles.spinnerContainer}>
+                <Spinner
+                  //visibility of Overlay Loading Spinner
+                  visible={this.state.imgLoading}
+                  //Text with the Spinner 
+                  textContent={'Sending ...'}
                   //Text style of the Spinner Text
                   textStyle={styles.spinnerTextStyle}
                   color={'#FF6200'}

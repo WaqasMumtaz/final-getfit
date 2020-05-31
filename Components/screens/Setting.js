@@ -15,18 +15,40 @@ export default class SettingScreen extends React.Component {
         super(props);
     }
 
-    logout = () => {
-        const { navigate } = this.props.navigation;
+    // logout = () => {
+    //     const { navigate } = this.props.navigation;
+    //     AsyncStorage.getItem("currentUser").then(value => {
+    //         if (value) {
+    //             let userData = JSON.parse(value);
+    //             userData.status = 'Offline'
+    //             db.ref(`users/${userData._id}`).update(userData);
+    //         }
+    //     })
+    //     AsyncStorage.clear();
+    //     navigate('Login')
+    // }
+
+    componentWillMount(){
         AsyncStorage.getItem("currentUser").then(value => {
             if (value) {
                 let userData = JSON.parse(value);
-                userData.status = 'Offline'
-                db.ref(`users/${userData._id}`).update(userData);
+                console.log('User DAta >>', userData);
+                this.setState({userData})
+                //userData.status = 'Offline'
+                // db.ref(`users/${userData._id}`).update(userData);
             }
         })
-        AsyncStorage.clear();
-        navigate('Login')
     }
+
+    logout = async () => {
+        const { navigate } = this.props.navigation;
+        this.state.userData.status = 'Offline';
+        db.ref(`users/${this.state.userData._id}`).update(this.state.userData);
+        console.log('State UserDAta >>', this.state.userData)
+        AsyncStorage.clear();
+        await navigate('Login')
+    }
+
 
     render() {
         const { navigate } = this.props.navigation;

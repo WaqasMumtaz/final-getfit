@@ -33,6 +33,7 @@ function requestData() {
     /* as native module requests are rendered asynchronously, add and return a promise */
     return new Promise((resolve, reject) => {
         BHealthKit.getConstants([BHealthKit.Type.StepCount]);
+        console.log('BHealthKit >>', BHealthKit.getConstants([BHealthKit.Type.StepCount]))
         BHealthKit.getStepsData(before.getTime(), date, (err, data) => {
             if (err) {
                 reject(err);
