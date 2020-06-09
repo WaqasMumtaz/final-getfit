@@ -6,7 +6,7 @@ const styles=StyleSheet.create({
 container:{
     flex:1,
     backgroundColor:'white',
-    marginHorizontal:16,
+    marginHorizontal:'7%',
 },
 headingContainer:{
     height:'8%',
@@ -99,19 +99,25 @@ cardsContainer:{
     flex:1,
     flexDirection:'row',
     marginTop:15,
-    //backgroundColor:'green',
+    // backgroundColor:'green',
+    // justifyContent:'flex-end'
     //width:'47%'
     //  flexWrap:'wrap',
-   //justifyContent:'space-between'
+   justifyContent:'space-between',
+//    paddingHorizontal:5
 },
 childContainerOne:{
     flex:1,
     //backgroundColor:'green'
+    //  paddingLeft:15
 },
-childContainerTwo:{
-    flex:1,
-    //backgroundColor:'red'
-},
+// childContainerTwo:{
+//     flex:1,
+//     // backgroundColor:'red',
+//     // flexDirection:'row',
+//     // justifyContent:'flex-end',
+//     paddingLeft:'14%'
+// },
 cardOne:{
     height:140,
     width:155,
@@ -129,7 +135,7 @@ cardTwo:{
     //borderColor:'white',
     borderRadius:5,
     backgroundColor:'#000000',
-    marginLeft:8
+    // marginLeft:23
 },
 cardTwoTextStyle:{
     color:'#FFFFFF',
@@ -153,7 +159,7 @@ cardFour:{
     backgroundColor:'black',
     borderRadius:5,
     marginTop:12,
-    marginLeft:8
+    // marginLeft:20
 },
 cardFourTextStyle:{
     color:'#FFFFFF',
@@ -177,7 +183,7 @@ bmiCard:{
     // borderColor:'black',
     borderRadius:5,
     marginTop:12,
-    marginLeft:8
+    // marginLeft:15
 
 },
 bmiHeading:{

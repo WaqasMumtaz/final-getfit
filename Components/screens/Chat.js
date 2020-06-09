@@ -32,7 +32,7 @@ import firebasePushNotification from 'react-native-firebase';
 import DocumentPicker from 'react-native-document-picker';
 // import RNFetchBlob from 'rn-fetch-blob';
 
-var logo  = require('../icons/logo.png');
+// var logo  = require('../icons/logo.png');
 
 
 YellowBox.ignoreWarnings([
@@ -94,7 +94,7 @@ class Chatscreen extends React.Component {
       senderData: '',
       isLoading: false,
       fileUpLoading: false,
-      imgLoading:false,
+      imgLoading: false,
       forVideoModal: false,
       smallVideo: true,
       largeSizeVideo: false,
@@ -106,8 +106,8 @@ class Chatscreen extends React.Component {
       chatDates: [],
       chatMonths: [],
       chatYear: [],
-      errorMessg:'',
-      alertError:false
+      errorMessg: '',
+      alertError: false
       // yesterdayDate: '',
       // deviceToken: '',
       // userToken: ''
@@ -139,7 +139,7 @@ class Chatscreen extends React.Component {
   componentWillMount() {
     const { senderData } = this.props.navigation.state.params;
     // console.log('WillMount Data Read >>', read);
-     console.log('Sender Data >>', senderData);
+    console.log('Sender Data >>', senderData);
     let chatArrayTemp = [];
     let dataFromLocalStorage;
     const hours = new Date().getHours();
@@ -198,12 +198,12 @@ class Chatscreen extends React.Component {
             // console.log('Firebase Database >>', firbaseData);
             if (firbaseData.reciverId == dataFromLocalStorage._id && firbaseData.senderId == senderData.userId) {
               chatArrayTemp.push(firbaseData);
-              console.log('Chat Array >>', chatArrayTemp);
+              // console.log('Chat Array >>', chatArrayTemp);
             }
             if (firbaseData.senderId == dataFromLocalStorage._id && firbaseData.reciverId == senderData.userId) {
               chatArrayTemp.push(firbaseData);
-              console.log('Chat Array >>', chatArrayTemp);
-              
+              // console.log('Chat Array >>', chatArrayTemp);
+
             }
           }
           this.setState({
@@ -351,8 +351,8 @@ class Chatscreen extends React.Component {
         else {
           console.log('Image Local url >>', response.uri);
           this.setState({
-            isLoading:true,
-            imgLoading:true
+            isLoading: true,
+            imgLoading: true
           })
           let timestamp = (Date.now() / 1000 | 0).toString();
           let api_key = '878178936665133'
@@ -370,8 +370,8 @@ class Chatscreen extends React.Component {
             // console.log('User Android imgurl >>', userImgUrl);
             this.uplaodDataOnFirebase(uploadData, 'image');
             this.setState({
-              isLoading:false,
-              imgLoading:false
+              isLoading: false,
+              imgLoading: false
             })
           };
           let formdata = new FormData();
@@ -401,8 +401,10 @@ class Chatscreen extends React.Component {
         }
         else {
           console.log('Image Local file >>', response.uri);
-          
-         
+          this.setState({
+            isLoading: true,
+            imgLoading: true
+          })
           let timestamp = (Date.now() / 1000 | 0).toString();
           let api_key = '878178936665133'
           let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
@@ -415,20 +417,28 @@ class Chatscreen extends React.Component {
           let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
           //  console.log('Upload URL >>', upload_url);
           let xhr = new XMLHttpRequest();
-         
+
           // console.log('XHR Url >>', xhr);
           xhr.open('POST', upload_url);
           xhr.onload = () => {
             let uploadData = JSON.parse(xhr._response)
             console.log('UploadDAta >>', uploadData);
             console.log('Upload Imag Error >>', uploadData.error);
-             if(uploadData.error){
-                Alert.alert(`${uploadData.error.message}`)
-              }
-              else {
-                 this.uplaodDataOnFirebase(uploadData, 'image');
+            if (uploadData.error) {
+              this.setState({
+                isLoading: false,
+                imgLoading: false
+              })
+              Alert.alert(`${uploadData.error.message}`)
+            }
+            else {
+              this.setState({
+                isLoading: false,
+                imgLoading: false
+              })
+              this.uplaodDataOnFirebase(uploadData, 'image');
 
-              }
+            }
             // if(uploadData){
             //   this.setState({
             //     isLoading:false,
@@ -451,17 +461,17 @@ class Chatscreen extends React.Component {
             // if(uploadData.error){
             //     Alert.alert(`${uploadData.error.message}`)
             // }
-              // if(uploadData && !uploadData.error) {
-              //   this.setState({
-              //     isLoading:false,
-              //     imgLoading:false
-              //   },()=>{
-              //       this.uplaodDataOnFirebase(uploadData, 'image');
-              //   })
-              // }
-            
-           
-            
+            // if(uploadData && !uploadData.error) {
+            //   this.setState({
+            //     isLoading:false,
+            //     imgLoading:false
+            //   },()=>{
+            //       this.uplaodDataOnFirebase(uploadData, 'image');
+            //   })
+            // }
+
+
+
             // if(uploadData.error){
             //   this.setState({
             //     isLoading:false,
@@ -478,7 +488,7 @@ class Chatscreen extends React.Component {
             //   })
             // }
           };
-         
+
           let formdata = new FormData();
           formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
           formdata.append('timestamp', timestamp);
@@ -568,6 +578,10 @@ class Chatscreen extends React.Component {
           res.name,
           res.size
         );
+        this.setState({
+          isLoading: true,
+          fileUpLoading: true
+        })
         let timestamp = (Date.now() / 1000 | 0).toString();
         let api_key = '878178936665133'
         let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
@@ -597,6 +611,7 @@ class Chatscreen extends React.Component {
       } catch (err) {
         if (DocumentPicker.isCancel(err)) {
           // User cancelled the picker, exit any dialogs or menus and move on
+          Alert.alert('Canceled from single doc picker');
         } else {
           throw err;
         }
@@ -925,7 +940,7 @@ class Chatscreen extends React.Component {
     let month;
     let year;
     let showDate;
-    // console.log('image path >>', imagePath)
+    console.log('todayDate >>', todayDate)
 
     //let userImg;
     // AsyncStorage.getItem('userSendImg').then(value =>{
@@ -988,11 +1003,14 @@ class Chatscreen extends React.Component {
               </Text>
               <View style={styles.timeAndCheck}>
                 <Text style={styles.timeText}>{message.time}</Text>
-                {message.status == 'sent' ?
-                  <View style={{ marginLeft: 5 }}>
-                    <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                  </View>
-                  : null
+                {message.status == 'seen' ?
+                  <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                  : message.status == 'delivered' ?
+                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                    : message.status == 'sent' ?
+                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                    :
+                    null
                 }
               </View>
             </View>
@@ -1003,19 +1021,23 @@ class Chatscreen extends React.Component {
                 onPress={this.expandImg.bind(this, message.message.secure_url)}
               >
                 {/* {console.log('message image >>', message.message)} */}
-                
+
                 <Image key={key} style={styles.mgsImges} source={{
-                  uri:`${message.message.secure_url}`
+                  uri: `${message.message.secure_url}`
                 }
                 } />
                 {/* <Text style={styles.timeText}>{message.time}</Text> */}
                 <View style={styles.timeAndCheck}>
                   <Text style={styles.timeText}>{message.time}</Text>
-                  {message.status == 'sent' ?
-                    <View style={{ marginLeft: 5 }}>
-                      <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                    </View>
-                    : null
+                  {message.status == 'seen' ?
+                    <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                    : message.status == 'delivered' ?
+                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                      : message.status == 'sent' ?
+                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                      :
+                      null
+
                   }
                 </View>
               </TouchableOpacity>
@@ -1040,11 +1062,14 @@ class Chatscreen extends React.Component {
                   {/* <Text style={styles.timeText}>{message.time}</Text> */}
                   <View style={styles.timeAndCheck}>
                     <Text style={styles.timeText}>{message.time}</Text>
-                    {message.status == 'sent' ?
-                      <View style={{ marginLeft: 5 }}>
-                        <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                      </View>
-                      : null
+                    {message.status == 'seen' ?
+                      <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                      : message.status == 'delivered' ?
+                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                        :message.status == 'sent' ?
+                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                        :
+                        null
                     }
                   </View>
                 </View>
@@ -1081,11 +1106,15 @@ class Chatscreen extends React.Component {
                         {/* <Text style={styles.timeText}>{message.time}</Text> */}
                         <View style={styles.timeAndCheck}>
                           <Text style={styles.timeText}>{message.time}</Text>
-                          {message.status == 'sent' ?
-                            <View style={{ marginLeft: 5 }}>
-                              <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                            </View>
-                            : null
+                          {message.status == 'seen' ?
+                            <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                            : message.status == 'delivered' ?
+                              <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                              :message.status == 'sent' ?
+                              <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                              :
+                              null
+
                           }
                         </View>
                       </TouchableOpacity>
@@ -1106,11 +1135,15 @@ class Chatscreen extends React.Component {
                           {/* <Text style={styles.timeText}>{message.time}</Text> */}
                           <View style={styles.timeAndCheck}>
                             <Text style={styles.timeText}>{message.time}</Text>
-                            {message.status == 'sent' ?
-                              <View style={{ marginLeft: 5 }}>
-                                <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                              </View>
-                              : null
+                            {message.status == 'seen' ?
+                              <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                              : message.status == 'delivered' ?
+                                <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                                : message.status == 'sent' ?
+                                <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                :
+                                null
+
                             }
                           </View>
                         </TouchableOpacity>
@@ -1131,11 +1164,15 @@ class Chatscreen extends React.Component {
                             {/* <Text style={styles.timeText}>{message.time}</Text> */}
                             <View style={styles.timeAndCheck}>
                               <Text style={styles.timeText}>{message.time}</Text>
-                              {message.status == 'sent' ?
-                                <View style={{ marginLeft: 5 }}>
-                                  <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                                </View>
-                                : null
+                              {message.status == 'seen' ?
+                                <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                                : message.status == 'delivered' ?
+                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                                  :message.status == 'sent' ?
+                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                  :
+                                  null
+
                               }
                             </View>
                           </TouchableOpacity>
@@ -1158,11 +1195,15 @@ class Chatscreen extends React.Component {
                             {/* <Text style={styles.timeText}>{message.time}</Text> */}
                             <View style={styles.timeAndCheck}>
                               <Text style={styles.timeText}>{message.time}</Text>
-                              {message.status == 'sent' ?
-                                <View style={{ marginLeft: 5 }}>
-                                  <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                                </View>
-                                : null
+                              {message.status == 'seen' ?
+                                <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                                : message.status == 'delivered' ?
+                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                                  :message.status == 'sent' ?
+                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                  :
+                                  null
+
                               }
                             </View>
                           </View>
@@ -1182,11 +1223,15 @@ class Chatscreen extends React.Component {
                               {/* <Text style={styles.timeText}>{message.time}</Text> */}
                               <View style={styles.timeAndCheck}>
                                 <Text style={styles.timeText}>{message.time}</Text>
-                                {message.status == 'sent' ?
-                                  <View style={{ marginLeft: 5 }}>
-                                    <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                                  </View>
-                                  : null
+                                {message.status == 'seen' ?
+                                  <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                                  : message.status == 'delivered' ?
+                                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                                    :message.status == 'sent' ?
+                                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                    :
+                                    null
+
                                 }
                               </View>
                             </View>
@@ -1261,11 +1306,15 @@ class Chatscreen extends React.Component {
                                 {/* <Text style={styles.timeText}>{message.time}</Text> */}
                                 <View style={styles.timeAndCheck}>
                                   <Text style={styles.timeText}>{message.time}</Text>
-                                  {message.status == 'sent' ?
-                                    <View style={{ marginLeft: 5 }}>
-                                      <Text style={{ color: '#A6A6A6' }}>_/</Text>
-                                    </View>
-                                    : null
+                                  {message.status == 'seen' ?
+                                    <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                                    : message.status == 'delivered' ?
+                                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                                      :message.status == 'sent' ?
+                                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                      :
+                                      null
+
                                   }
                                 </View>
                               </View>

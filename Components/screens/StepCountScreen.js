@@ -14,16 +14,16 @@ import {
 import { NativeAppEventEmitter } from 'react-native';
 import { SensorManager } from 'NativeModules';
 import GoogleFit, { Scopes } from 'react-native-google-fit'
-import { NativeModules } from 'react-native';
 import { thisExpression } from '@babel/types';
 import OverlayLoader from '../Loader/OverlaySpinner';
-//import { TextInput } from 'react-native-gesture-handler';
+import {NativeModules} from 'react-native';
 const RNHealthKit = NativeModules.RNHealthKit;
 import ToggleSwitch from 'toggle-switch-react-native';
 // Import the react-native-pedometer module
 import Fitness from '@ovalmoney/react-native-fitness';
 import Health from '../counter/health.ios';
 import HealthAndroid from '../counter/health.android';
+import AppleHealthKit from 'rn-apple-healthkit';
 
 const { heightDimension } = Dimensions.get('window');
 const date = new Date().getDate();
@@ -497,6 +497,7 @@ if(Platform.OS === 'android'){
                 if (data.steps != 0 && Number(this.state.goalSteps) != 0) {
                     if (data.steps == Number(this.state.goalSteps)) {
                         console.log('steps match ')
+                        Alert.alert('Congrates Your Steps Match')
                         // this.setState({
                         //     showButton: true
                         // })
@@ -514,15 +515,108 @@ if(Platform.OS === 'android'){
         
         if (Platform.OS === 'ios') {
             console.log('IOS Stepcounter Running Successfully ')
-            // console.log('NativeAppEventEmitter >>',NativeAppEventEmitter);
+             // Health()
+            // let workoutData = [];
 
-            // NativeAppEventEmitter.addListener(
-            //     'StepChangedEvent',(steps)=>
-            //     {
-            //       console.log('Steps ios >>', steps)
-            //     })
-                 Health()
+            let d = new Date();
+            let options1 = {
+                    date: d.toISOString()
+             };
+
+            //  console.log('DDDDate >>', d);
+            //  console.log('Options >>', options);
+              console.log('AppleHealthKit >>', AppleHealthKit);
+              let options = {
+                permissions: {
+                    read: ["Height", "Weight", "StepCount", "DateOfBirth", "BodyMassIndex"],
+                    write: ["Weight", "StepCount", "BodyMassIndex","Steps"]
+                }
+            };   
+
+            // HealthKit Init code 
+            AppleHealthKit.initHealthKit(options, (err, results) => {
+                if (err) {
+                    console.log("error initializing Healthkit: ", err);
+                    return;
+                }
+
+                // console.log('HealthKit Result >>', results);
+
+                 AppleHealthKit.setObserver({ type: 'Walking' });
+                 AppleHealthKit.initStepCountObserver({}, () => {});
+                NativeAppEventEmitter.addListener('observer',(result)=>{
+                 console.log('Ios Steps >>', result);
+                },2000);
+
+                this.sub = NativeAppEventEmitter.addListener(
+                    'change:steps',
+                    (evt) => {
+                      // a 'change:steps' event has been received. step
+                      // count data should be re-fetched from Healthkit.
+                      console.log('Steps >>', evt);
+                      
+                    }
+                  );
+            
+                  AppleHealthKit.getStepCount(options, (err, results) => {
+                if (err) {
+                    console.log('Steps Error >>', err);
+                    return;
+                }
+                else{
+                    // console.log('Steps Result >>',results)
+                    console.log('sensor manager data -->>', results)
+                    params.pedometerFun(results.value)
+                    this.setState({ pedometerData: results.value }, () => {
+                        if (results.value > Number(1)) {
+                            //this.countStepTime()
+                            if (this.state.eightToSixteen == true) {
+                                this.setState({
+                                    firstValue: results.value
+                                })
+                            }
+                            else if (this.state.sixteenTo23 == true) {
+                                this.setState({
+                                    secondValue: results.value
+                                })
+                            }
+                            else if (this.state.oneToEight == true) {
+                                this.setState({
+                                    thirdValue: results.value
+                                })
         
+                            }
+                            const multiplySteps = results.value / Number(this.state.goalSteps);
+                            //console.log('multiply >>',multiplySteps);
+                            const divideSteps = multiplySteps * 100;
+                            //console.log('divided >>',divideSteps )
+                            const roundedValue = Math.round(divideSteps);
+                            //console.log('percentage steps >>',roundedValue)
+                            this.setState({
+                                stepsPercentage: roundedValue
+                            })
+        
+                        }
+                        if (results.value != 0 && Number(this.state.goalSteps) != 0) {
+                            if (results.value == Number(this.state.goalSteps)) {
+                                console.log('steps match ')
+                                Alert.alert('Congrates Your Steps Match')
+                                // this.setState({
+                                //     showButton: true
+                                // })
+                            }
+                        }
+        
+        
+                    })
+
+                }
+            });
+
+                
+            
+            }); 
+            
                      
     }
 
@@ -614,7 +708,7 @@ if(Platform.OS === 'android'){
 
             if (Number(this.state.seconds_Counter) == 59) {
                 count = (Number(this.state.minutes_Counter) + 1).toString();
-                this.updateCalories(count)
+                // this.updateCalories(count)
                 num = '00';
             }
             if (Number(this.state.minutes_Counter) == 59) {
@@ -715,6 +809,8 @@ if(Platform.OS === 'android'){
 
             //currentUserId
         } = this.state;
+        const caloriesBurn = Number(pedometerData) * Number(0.045);
+        // console.log('Calories BURN >>', caloriesBurn); 
         //console.log(currentUserId)
         //console.log('pedometer data in number form ', Number(pedometerData))
         //console.log('goal steps database >>',stepGoalCountData)
@@ -822,7 +918,7 @@ if(Platform.OS === 'android'){
                                     {this.state.startDisable == false ? 'Tracker Unactivate' : 'Tracker Activate'}
                                 </Text>
                                 <Text style={{ marginTop: 4, borderBottomWidth: 0.5, borderColor: '#FFFFFF', opacity: 0.3, marginRight: 15 }}></Text>
-                                <Text style={{ color: '#a6a6a6', fontSize: 11, marginTop: 5, marginRight: 50 }}>{currentCalories == '' ? 0 : Number(currentCalories)}</Text>
+                                <Text style={{ color: '#a6a6a6', fontSize: 11, marginTop: 5, marginRight: 50 }}>{caloriesBurn}</Text>
                                 <Text style={{ color: '#a6a6a6', fontSize: 11, marginTop: 4, marginRight: 30, marginBottom: 5, paddingBottom: 5 }}>calories</Text>
                             </View>
 

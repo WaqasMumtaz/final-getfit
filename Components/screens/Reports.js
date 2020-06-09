@@ -10,6 +10,7 @@ import {
   DeviceEventEmitter // will emit events that you can listen to
 } from 'react-native';
 import { NativeAppEventEmitter } from 'react-native';
+console.log('NativeAppEventEmitter >>', NativeAppEventEmitter);
 import { SensorManager } from 'NativeModules';
 import Health from '../counter/health.ios';
 
@@ -96,12 +97,12 @@ class Reportscreen extends React.Component {
           
           if (Platform.OS === 'ios') {
               console.log('IOS Stepcounter Running Successfully ')
-                          //  Health()
-                          NativeAppEventEmitter.addListener(
-                            'StepChangedEvent',(steps)=>
-                            {
-                              console.log('Steps ios >>', steps)
-                            })
+                            Health()
+                          // NativeAppEventEmitter.addListener(
+                          //   'StepChangedEvent',(steps)=>
+                          //   {
+                          //     console.log('Steps ios >>', steps)
+                          //   })
                              
                   
           }  
@@ -111,7 +112,7 @@ class Reportscreen extends React.Component {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener('didFocus', () => {
       // BackHandler.addEventListener("hardwareBackPress", this.onBack)
-      // console.log('Running Successfully Add Listener Function')
+       console.log('Running Successfully Add Listener Function')
       this.getData();
     })
   }
@@ -174,6 +175,7 @@ class Reportscreen extends React.Component {
     let data = dataExcersice.content;
     let weightData = dataWeight.content;
     let userGoalSteps = retrieveGoalSteps.content;
+    console.log('userGoalSteps >>', userGoalSteps)
     let userPedometerDataSteps = userPedometerData.content
     // console.log('User GoalSteps >>', userGoalSteps)
 
@@ -218,12 +220,15 @@ class Reportscreen extends React.Component {
         const justGoalSteps = userGoalSteps[i].goalSteps;
         //  console.log('goalSteps >>', goalStepsData)
         const date = goalStepsData.date;
-        // console.log('goal date >>', date);
+         console.log('goalSteps date >>', date);
         const getMonth = goalStepsData.month;
         const getMontName = monthName[getMonth];
         goalStepsData.monthName = getMontName;
         // console.log('goal month >>', getMonth);
         const getYear = goalStepsData.year;
+       const dateTo = moment().format('YYYY-MM-DD');
+       const dateFrom = moment().subtract(7,'d').format('YYYY-MM-DD');
+       console.log('DateTo >>',dateTo , 'DateFrom >>', dateFrom);
         // console.log('goal steps year >>', getYear);
         // let checkWeekDay = (Math.abs(currentDayOfWeek - goalStepsData.dayOfWeek));
         // console.log('weekDay >>', checkWeekDay)
@@ -240,11 +245,11 @@ class Reportscreen extends React.Component {
         var toDate = new Date();
         for (var k = dayCount; k = dayCount; k--) {
           var sevenDaysAgo = moment().subtract(dayCount, 'days').toDate();
-          // console.log('SevenDaysAgo Data >>', sevenDaysAgo);
-          var dayOfMonthAgo = sevenDaysAgo.getDate() + 1;
-          // console.log('dayOfMonthAgo >>', dayOfMonthAgo);
+           console.log('SevenDaysAgo Data >>', sevenDaysAgo);
+          var dayOfMonthAgo = sevenDaysAgo.getDate();
+           console.log('dayOfMonthAgo >>', dayOfMonthAgo);
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
-          // console.log('monthNoOfYear >>', monthNoOfYear);
+           console.log('monthNoOfYear >>', monthNoOfYear);
            var yearNo = sevenDaysAgo.getFullYear();
            dayCount--;
           //  console.log('DayCount >>', dayCount);
@@ -255,10 +260,10 @@ class Reportscreen extends React.Component {
             if (dayOfMonthAgo == Number(date) && monthNoOfYear == Number(getMonth) &&
               yearNo == Number(getYear)) {
                 dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
-                // console.log('If Condition Data Exercise >>', dataExcersiceArr);
+                 console.log('If Condition Data Exercise >>', dataExcersiceArr);
                 this.setState({
                   weekAgoDateDataGoalSteps: dataExcersiceArr
-                })
+                },()=>console.log('State goalsteps >>', this.state.weekAgoDateDataGoalSteps))
               // weeksProduct.push(data[j])
             }
           }
@@ -330,7 +335,7 @@ class Reportscreen extends React.Component {
         for (var k = dayCount; k = dayCount; k--) {
           var sevenDaysAgo = moment().subtract(dayCount, 'days').toDate();
           // console.log('SevenDaysAgo Data >>', sevenDaysAgo);
-          var dayOfMonthAgo = sevenDaysAgo.getDate() + 1;
+          var dayOfMonthAgo = sevenDaysAgo.getDate();
           // console.log('dayOfMonthAgo >>', dayOfMonthAgo);
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
           // console.log('monthNoOfYear >>', monthNoOfYear);
@@ -388,7 +393,7 @@ class Reportscreen extends React.Component {
         for (var l = dayCount; l = dayCount; l--) {
           var sevenDaysAgo = moment().subtract(dayCount, 'days').toDate();
           // console.log('SevenDaysAgo Data >>', sevenDaysAgo);
-          var dayOfMonthAgo = sevenDaysAgo.getDate() + 1;
+          var dayOfMonthAgo = sevenDaysAgo.getDate();
           //  console.log('dayOfMonthAgo >>', dayOfMonthAgo);
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
           //  console.log('Month No of Year >>', monthNoOfYear);

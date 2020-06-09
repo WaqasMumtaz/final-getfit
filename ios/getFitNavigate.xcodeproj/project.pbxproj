@@ -43,6 +43,13 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = getFitNavigate;
 		};
+		0421358B24840B6A00170865 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
+			remoteInfo = getFitNavigate;
+		};
 		2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
@@ -59,6 +66,7 @@
 		00E356F21AD99517003FC87E /* getFitNavigateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = getFitNavigateTests.m; sourceTree = "<group>"; };
 		037FE39B7B346618B6D999B7 /* Pods-getFitNavigate.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getFitNavigate.debug.xcconfig"; path = "Target Support Files/Pods-getFitNavigate/Pods-getFitNavigate.debug.xcconfig"; sourceTree = "<group>"; };
 		043C5F33247F763100CD541E /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
+		043F5D08248537480068FE72 /* Get Fit AthleticRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get Fit AthleticRelease.entitlements"; path = "getFitNavigate/Get Fit AthleticRelease.entitlements"; sourceTree = "<group>"; };
 		045E64E72463E9050065297C /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		045E64E9246401790065297C /* BHealthKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BHealthKit.h; sourceTree = "<group>"; };
 		045E64EA246401790065297C /* BHealthKit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BHealthKit.m; sourceTree = "<group>"; };
@@ -69,7 +77,7 @@
 		04F7CD37243A53F30046873D /* libDoubleConversion.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libDoubleConversion.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		0782DCDA0E5EE81DC1F5142B /* libPods-getFitNavigate.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-getFitNavigate.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1172E3CB81EBDFFF1DBBA78F /* Pods-getFitNavigateTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-getFitNavigateTests.release.xcconfig"; path = "Target Support Files/Pods-getFitNavigateTests/Pods-getFitNavigateTests.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* getFitNavigate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = getFitNavigate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Get Fit Athletic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get Fit Athletic.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = getFitNavigate/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = getFitNavigate/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -154,7 +162,6 @@
 		13B07FAE1A68108700A75B9A /* getFitNavigate */ = {
 			isa = PBXGroup;
 			children = (
-				04D7DD082451AF2200490F38 /* getFitNavigateDebug.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -196,6 +203,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				043F5D08248537480068FE72 /* Get Fit AthleticRelease.entitlements */,
+				04D7DD082451AF2200490F38 /* getFitNavigateDebug.entitlements */,
 				043C5F33247F763100CD541E /* assets */,
 				13B07FAE1A68108700A75B9A /* getFitNavigate */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -213,7 +222,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* getFitNavigate.app */,
+				13B07F961A680F5B00A75B9A /* Get Fit Athletic.app */,
 				00E356EE1AD99517003FC87E /* getFitNavigateTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* getFitNavigate-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* getFitNavigate-tvOSTests.xctest */,
@@ -286,7 +295,7 @@
 			);
 			name = getFitNavigate;
 			productName = getFitNavigate;
-			productReference = 13B07F961A680F5B00A75B9A /* getFitNavigate.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Get Fit Athletic.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* getFitNavigate-tvOS */ = {
@@ -323,6 +332,7 @@
 			);
 			dependencies = (
 				2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */,
+				0421358C24840B6A00170865 /* PBXTargetDependency */,
 			);
 			name = "getFitNavigate-tvOSTests";
 			productName = "getFitNavigate-tvOSTests";
@@ -343,6 +353,7 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 9RA235CN73;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
@@ -351,12 +362,14 @@
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 9RA235CN73;
 						ProvisioningStyle = Automatic;
 					};
 					2D02E48F1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 9RA235CN73;
 						ProvisioningStyle = Automatic;
-						TestTargetID = 2D02E47A1E0B4A5D006451C7;
+						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 				};
 			};
@@ -693,6 +706,11 @@
 			target = 13B07F861A680F5B00A75B9A /* getFitNavigate */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
+		0421358C24840B6A00170865 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 13B07F861A680F5B00A75B9A /* getFitNavigate */;
+			targetProxy = 0421358B24840B6A00170865 /* PBXContainerItemProxy */;
+		};
 		2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2D02E47A1E0B4A5D006451C7 /* getFitNavigate-tvOS */;
@@ -718,6 +736,7 @@
 			baseConfigurationReference = FFC6C8561FC1BAD86E8FE144 /* Pods-getFitNavigateTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -732,7 +751,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/getFitNavigate.app/getFitNavigate";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Get Fit Athletic.app/Get Fit Athletic";
 			};
 			name = Debug;
 		};
@@ -742,6 +761,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				INFOPLIST_FILE = getFitNavigateTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -752,7 +772,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/getFitNavigate.app/getFitNavigate";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Get Fit Athletic.app/Get Fit Athletic";
 			};
 			name = Release;
 		};
@@ -763,13 +783,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = getFitNavigate/getFitNavigateDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 9RA235CN73;
 				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = getFitNavigate/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -777,9 +798,9 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.getfitathletic;
-				PRODUCT_NAME = getFitNavigate;
+				PRODUCT_NAME = "Get Fit Athletic";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -789,11 +810,14 @@
 			baseConfigurationReference = 7E87FFD2D29B81C89A57E80D /* Pods-getFitNavigate.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "getFitNavigate/Get Fit AthleticRelease.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9RA235CN73;
 				ENABLE_TESTABILITY = NO;
 				INFOPLIST_FILE = getFitNavigate/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -801,8 +825,9 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.getfitathletic;
-				PRODUCT_NAME = getFitNavigate;
-				TARGETED_DEVICE_FAMILY = 1;
+				PRODUCT_NAME = "Get Fit Athletic";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -818,6 +843,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "getFitNavigate-tvOS/Info.plist";
@@ -847,6 +873,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "getFitNavigate-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -873,6 +900,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "getFitNavigate-tvOSTests/Info.plist";
@@ -885,7 +913,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.getFitNavigate-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/getFitNavigate-tvOS.app/getFitNavigate-tvOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Get Fit Athletic.app/Get Fit Athletic";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 			};
 			name = Debug;
@@ -901,6 +929,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "getFitNavigate-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -912,7 +941,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.getFitNavigate-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/getFitNavigate-tvOS.app/getFitNavigate-tvOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Get Fit Athletic.app/Get Fit Athletic";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 			};
 			name = Release;
@@ -946,6 +975,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -999,6 +1029,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = 9RA235CN73;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;

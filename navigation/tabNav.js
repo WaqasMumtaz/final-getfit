@@ -37,7 +37,7 @@ const MainNavigator = createBottomTabNavigator({
       }
     }
   },
-  Chatscreen: {
+  ChatInbox: {
     screen: ChatInbox,
     navigationOptions: {
       tabBarIcon: (navigation) => {

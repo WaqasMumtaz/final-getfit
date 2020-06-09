@@ -192,9 +192,9 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#ff6200',
         // fontFamily: 'MontserratMedium',
-        marginRight: '35%',
+        // marginRight: '35%',
         marginVertical: 15,
-        justifyContent: 'center',
+        // justifyContent: 'center',
     },
     backgroundVideo: {
         // position: 'absolute',
@@ -725,13 +725,15 @@ const styles = StyleSheet.create({
         // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 10,
+        paddingHorizontal: 10,
+        
+    },
+    mainInboxContainer:{
         borderBottomColor:'#e5e5e5',
-        borderBottomWidth:1,
+        borderBottomWidth:2,
         //borderRadius:2,
         borderBottomLeftRadius:75,
         borderBottomRightRadius:5
-
     },
     name: {
         // fontFamily: "MontserratMedium",
@@ -834,6 +836,25 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignSelf:'flex-end'
     },
+    checkAndMessgContainer:{
+        flexDirection:'row',
+        justifyContent:'flex-end',
+        marginBottom:15
+    },
+    imagesAndText:{
+        flexDirection:'row',
+        marginRight:'3%'
+    },
+    iconsStyle:{
+        height:25,
+        width:20,
+        marginBottom:5
+    },
+    textInbox:{
+        color: 'gray', 
+        fontSize: 12, 
+        marginLeft: 5 
+    }
     
 });
 

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Login from '../Components/screens/Login';
@@ -52,7 +53,7 @@ const MainNavigator = createStackNavigator({
   Setupscreen: {
     screen: Setupscreen
   },
-  ChatBox: {
+  Chatscreen: {
     screen: Chatscreen,
     navigationOptions: {
       headerStyle: {

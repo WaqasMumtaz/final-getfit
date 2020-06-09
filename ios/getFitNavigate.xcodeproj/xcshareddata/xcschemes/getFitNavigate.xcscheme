@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "getFitNavigate.app"
+               BuildableName = "Get Fit Athletic.app"
                BlueprintName = "getFitNavigate"
                ReferencedContainer = "container:getFitNavigate.xcodeproj">
             </BuildableReference>
@@ -73,7 +73,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "getFitNavigate.app"
+            BuildableName = "Get Fit Athletic.app"
             BlueprintName = "getFitNavigate"
             ReferencedContainer = "container:getFitNavigate.xcodeproj">
          </BuildableReference>
@@ -106,7 +106,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "getFitNavigate.app"
+            BuildableName = "Get Fit Athletic.app"
             BlueprintName = "getFitNavigate"
             ReferencedContainer = "container:getFitNavigate.xcodeproj">
          </BuildableReference>
@@ -123,7 +123,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "getFitNavigate.app"
+            BuildableName = "Get Fit Athletic.app"
             BlueprintName = "getFitNavigate"
             ReferencedContainer = "container:getFitNavigate.xcodeproj">
          </BuildableReference>
@@ -134,6 +134,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "Get Fit Athletic"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
