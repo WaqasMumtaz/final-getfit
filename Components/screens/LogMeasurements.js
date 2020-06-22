@@ -155,71 +155,7 @@ class LogMeasurementsScreen extends React.Component {
                 isLoading: false,
             })
         }
-        // if (neck == ''){
-        //     this.setState({
-        //         neckValidation: true,
-        //         isLoading:false,
-        //     })
-        // }
-        // else {
-        //     this.setState({
-        //         neckValidation: false,
-        //         isLoading:false,
-        //     })
-        // }
-        // if(shoulder == ''){
-        //     this.setState({
-        //         shoulderValidation: true,
-        //         isLoading:false,
-        //     })
-        // }
-        // else {
-        //     this.setState({
-        //         shoulderValidation: false,
-        //         isLoading:false,
-        //     })
-        // }
-        // if(biceps == ''){
-        //     this.setState({
-        //         bicepsValidation: true,
-        //         isLoading:false,
-        //     })
-        // }
-        // else {
-        //     this.setState({
-        //         bicepsValidation: false,
-        //         isLoading:false,
-        //     })
-        // }
-        // if(chest == ''){
-        //     this.setState({
-        //         chestValidation: true,
-        //         isLoading:false,
-        //     })
-        // }
-        // else {
-        //     this.setState({
-        //         chestValidation: false,
-        //         isLoading:false,
-        //     })
-        // }
-
-
-        // if(thigh == ''){
-        //     this.setState({
-        //         thighValidation: true,
-        //         isLoading:false,
-        //     })
-
-        // }
-
-        // else {
-        //     this.setState({
-        //         thighValidation: false,
-        //         isLoading:false,
-        //     })
-        // }
-
+       
         if (weight != '' && waistAtNaval != '') {
             addWeight.weight = weight + ' KG';
             addWeight.arms = arms != '' ? arms + ' Inches' : 0 + ' Inches';
@@ -307,7 +243,7 @@ class LogMeasurementsScreen extends React.Component {
                 const allUsers = allUsersData[i];
                 if (allUsers.userId == userId) {
                     //  console.log('Current User Successfully Match');
-                      console.log('allUsers Data  >>>', allUsers);
+                    //   console.log('allUsers Data  >>>', allUsers);
                     // if (allUsers.dayOfMonth == dayOfMonth) {
                        const spaceIndexWeight = allUsers.weight.indexOf(' ');
                     //    console.log('Weight >>', allUsers.weight);
@@ -321,7 +257,7 @@ class LogMeasurementsScreen extends React.Component {
                        const biceps = allUsers.biceps.slice(0, spaceIndexBiceps);
                        const spaceIndexChest = allUsers.chest.indexOf(' ');
                        const chest = allUsers.chest.slice(0 , spaceIndexChest);
-                        console.log('waist At  waistAtNaval>>', allUsers.waistAtNaval);
+                        // console.log('waist At  waistAtNaval>>', allUsers.waistAtNaval);
                        const spaceIndexWaistAtNaval = allUsers.waistAtNaval.indexOf(' ');
                     //    console.log('index of spaceIndexWaistAtNaval >>', spaceIndexWaistAtNaval)
                         const waistAtNaval = allUsers.waistAtNaval.slice(0 , spaceIndexWaistAtNaval);
@@ -403,7 +339,7 @@ class LogMeasurementsScreen extends React.Component {
         //     'Hips -->>', this.state.hips,
         //     'above', this.state.above2Inches
         // )
-        console.log('date >>', date)
+        // console.log('date >>', date)
         return (
             <KeyboardAwareView animated={true}>
             <View style={styles.mainContainer}>

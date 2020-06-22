@@ -1,4 +1,6 @@
 import React, { Component } from 'react-native';
+import moment from "moment";
+
 
 /* Add and start up our module. BHealthKit contains two methods that we created in BHealthKit.m
 */
@@ -9,17 +11,17 @@ let auth;
 // function to request authorization rights
 function requestAuth() {
     console.log('BHealth >>', BHealthKit);
-     return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         BHealthKit.askForPermissionToReadTypes([BHealthKit.Type.StepCount], (err) => {
             if (err) {
-                 console.log('health error >>', err);
+                console.log('health error >>', err);
                 reject(err);
             } else {
-                 resolve(true);
-                 console.log('StepCount Successfully Run')
+                resolve(true);
+                console.log('StepCount Successfully Run')
             }
         });
-     });
+    });
 }
 // function to request data
 function requestData() {
@@ -28,8 +30,8 @@ function requestData() {
     let before = new Date();
     // console.log('Current DAte .>', before);
     before.setDate(before.getDate() - 5);
-    // console.log('Before Date time >>>',before.getTime());
-    
+    console.log('Before Date time >>>', before);
+
     /* as native module requests are rendered asynchronously, add and return a promise */
     return new Promise((resolve, reject) => {
         BHealthKit.getConstants([BHealthKit.Type.StepCount]);
@@ -42,7 +44,7 @@ function requestData() {
             } else {
                 console.log('Running health ios ')
                 let result = {};
-/* Rended the data to display it as we need */
+                /* Rended the data to display it as we need */
                 console.log('StepsData >>', data)
                 for (let val in data) {
                     const date = new Date(data[val].start_date);
@@ -56,7 +58,26 @@ function requestData() {
                     result[day]['date'] = date;
                     // console.log('Your Result >>', result);
                 }
-                console.log('Your Result >>', result);
+                // console.log('Your Result >>', (result[]));
+                
+
+                let dayCount = 7;
+                // var toDate = new Date();
+                for (var k = dayCount; k = dayCount; k--) {
+                    var sevenDaysAgo = moment().subtract(dayCount, 'days').toDate();
+                    // console.log('SevenDaysAgo Data >>', sevenDaysAgo);
+                    var dayOfMonthAgo = sevenDaysAgo.getDate();
+                    console.log('dayOfMonthAgo >>', dayOfMonthAgo);
+                    var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
+                    console.log('monthNoOfYear >>', monthNoOfYear);
+                    var yearNo = sevenDaysAgo.getFullYear();
+                    console.log('Year No >>', yearNo);
+                    dayCount--;
+                    if(dayOfMonthAgo == Object.keys(result)){
+                        console.log('Match Result >>', result.steps);
+                    }
+                }
+
                 resolve(Object.values(result));
             }
         });

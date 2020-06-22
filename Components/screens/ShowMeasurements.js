@@ -78,7 +78,7 @@ class ShowMeasurementsScreen extends React.Component {
     getData = async () => {
         try {
             let dataUser = await HttpUtilsFile.get('getweightlog')
-            console.log(dataUser, 'dataUser');
+            // console.log(dataUser, 'dataUser');
             let code = dataUser.code;
             if (code) {
                 let getUserData = await AsyncStorage.getItem('currentUser');
@@ -193,7 +193,7 @@ class ShowMeasurementsScreen extends React.Component {
                         // fontFamily: "MontserratMedium"
                     }
                     }
-                        >No Found Measurements</Text>
+                        >Measurements not found</Text>
                    </View>
                     }
 

@@ -6,6 +6,8 @@ import DatePicker from 'react-native-datepicker';
 import AsyncStorage from '@react-native-community/async-storage';
 import HttpUtils from '../Services/HttpUtils';
 import { Dropdown } from 'react-native-material-dropdown';
+import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
+
 
 
 const { HeightDimension } = Dimensions.get('window');
@@ -114,7 +116,7 @@ class Macrocalculator extends React.Component {
                     //fitnessGoal: params.fitnessGoal
                 }, () => {
                     this.fitnessResultDataGetting();
-                    console.log('fitness goal will mount >>', this.state.fitnessGoal)
+                    // console.log('fitness goal will mount >>', this.state.fitnessGoal)
 
 
                 })
@@ -1159,9 +1161,10 @@ class Macrocalculator extends React.Component {
             impClick, metrilClick, unitValue, unitValidation, height, mild, extremeBtn, normal, desiredUnitValue, desiredUnitValidation,
             fitnessGoal, showDesiredBtn, fitnessValidation, lose, gain, maintain, currentDate
         } = this.state;
-        console.log('date >>>', date)
-        console.log('fitness goal >', fitnessGoal)
+        // console.log('date >>>', date)
+        // console.log('fitness goal >', fitnessGoal)
         return (
+            <KeyboardAwareView animated={true}>
             <ScrollView style={{ flex: 1, backgroundColor: 'white', height: HeightDimension }} contentContainerStyle={{ flexGrow: 1 }}  >
                 <View style={styles.mainContainer}>
                     <View style={styles.childContainer}>
@@ -1254,7 +1257,7 @@ class Macrocalculator extends React.Component {
                                             onPress={this.getUnit.bind(this, 'extreme')}
                                             style={extremeBtn ? styles.clickedButton : styles.buttonStyle}
                                         >
-                                            <Text style={styles.maleTextStyle}>Exreme</Text>
+                                            <Text style={styles.maleTextStyle}>Extreme</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -1336,7 +1339,7 @@ class Macrocalculator extends React.Component {
                             unitValue == 'imperial' ?
                                 <View>
                                     <View style={{ flexDirection: 'row', marginRight: 50, justifyContent: 'space-between' }}>
-                                        <Text style={styles.styleForLabel}>Height (fit)</Text>
+                                        <Text style={styles.styleForLabel}>Height (ft)</Text>
                                         <Text style={styles.styleForLabel}>Height (Inch)</Text>
                                     </View>
                                     <View style={styles.heightContainer}>
@@ -1383,7 +1386,7 @@ class Macrocalculator extends React.Component {
                                     <View style={styles.showValidationContainer}>
                                         {heightValidation ?
                                             <Text style={styles.validationInstruction}>
-                                                Please fill your height fit
+                                                Please fill your height ft
                                 </Text>
 
                                             : null}
@@ -1542,49 +1545,7 @@ class Macrocalculator extends React.Component {
                         }
 
 
-                        {/* <Text style={styles.styleForLabel}>Goal Weight</Text>
-                        <View style={styles.goalWeightContainer}>
-                            <View style={styles.inputContainer}>
-                                <View style={styles.container}>
-                                    <TouchableOpacity style={styles.touchableOpacityOne} activeOpacity={0.8}
-                                        onPress={this.decrementVal.bind(this, 'goalWeight')}>
-                                        <Image source={require('../icons/minus-gray.png')} style={styles.forImg} />
-                                    </TouchableOpacity>
-                                    <View style={styles.textInputContainer}>
-                                        <TextInput keyboardType='numeric' maxLength={3} placeholder='0' style={styles.textInputStyleParent}
-                                            type="number"
-                                            onChangeText={(goalWeight) => this.setState({ goalWeight: goalWeight })}
-                                            value={this.state.goalWeight}
-                                        />
-                                    </View>
-                                    <TouchableOpacity style={styles.touchableOpacityTwo} activeOpacity={0.8}
-                                        onPress={this.increamentVal.bind(this, 'goalWeight')}>
-                                        <Image source={require('../icons/plus-gray.png')} style={styles.forImg} />
-                                    </TouchableOpacity>
-                                </View>
-
-                            </View>
-                            <View style={{ borderRadius: 4, borderColor: '#e5e5e5', overflow: 'hidden', marginTop: 5, height: 40 }}>
-                                <Picker selectedValue={this.state.goalWeightUnit}
-                                    onValueChange={this.updateUnits.bind(this, 'goal weight Unit')}
-                                    style={styles.pickerStyle}>
-                                    <Picker.Item label='Select an option...' value='0' />
-                                    <Picker.Item label="KG" value="kg" />
-                                </Picker>
-                            </View>
-                        </View>
-                        <View style={styles.showValidationContainer}>
-                            {goalWeightValidation ?
-                                <Text style={styles.validationInstruction}>
-                                    Please fill your goal weight
-                                </Text>
-                                : null}
-                            {goalWeightUnitValidation ?
-                                <Text style={styles.validationInstruction}>
-                                    Please select weight unit
-                                </Text>
-                                : null}
-                        </View> */}
+                        
 
                         <Text style={styles.styleForLabel}>Activity Level</Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -1657,7 +1618,7 @@ class Macrocalculator extends React.Component {
                     </View>
                     <View style={styles.lastParaContainer}>
                         <Text style={styles.lastParaStyle}>
-                            *This is the daily calories limit as calculated by the app using the above infromation.
+                            *This is the daily calories limit as calculated by the app using the above information.
                             If your coach has set another limit for you, please enter it above.
                         </Text>
                     </View>
@@ -1671,6 +1632,8 @@ class Macrocalculator extends React.Component {
                     </View>
                 </View>
             </ScrollView >
+           </KeyboardAwareView>
+
         )
     }
 

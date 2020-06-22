@@ -8,9 +8,9 @@ class ChartScreen extends React.Component {
         this.state = {};
     }
     render() {
-        const { lastWeek, cureentWeek } = this.props;
+        const { lastWeek, cureentWeek , key } = this.props;
         return (
-            <View style={styles.mainContainer} >
+            <View style={styles.mainContainer} key={key}>
                 <BarChart dataSets={
                     //current week graph
                     [

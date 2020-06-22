@@ -1,5 +1,10 @@
 import React from 'react';
-import { Alert, StyleSheet, Image, Text, View, ScrollView, Dimensions, TextInput, Picker, TouchableOpacity } from 'react-native';
+import {
+    Alert, StyleSheet,
+    Image, Text, View,
+    ScrollView, Dimensions,
+    TextInput, Picker, TouchableOpacity, Platform
+} from 'react-native';
 import styles from '../Styling/PaymentScreenStyle';
 import CaloriesSetupBtn from '../buttons/setUpBtn';
 // import stripe from 'tipsi-stripe';
@@ -14,6 +19,8 @@ const CryptoJS = require('crypto-js');
 import { Dropdown } from 'react-native-material-dropdown';
 import { KeyboardAwareView } from 'react-native-keyboard-aware-view';
 import DatePicker from 'react-native-datepicker';
+import Spinner from 'react-native-loading-spinner-overlay';
+
 
 
 
@@ -56,6 +63,8 @@ class Payment extends React.Component {
             btnDisable: false,
             dataSubmit: false,
             isLoading: false,
+            uploading: false,
+            imgLoading: false,
             position: 'top',
             creditScreen: true,
             buttonActive: true,
@@ -70,7 +79,7 @@ class Payment extends React.Component {
             userId: '',
             serviceName: '',
             countryCode: '',
-            date:''
+            date: ''
         }
     }
     componentWillMount() {
@@ -93,25 +102,25 @@ class Payment extends React.Component {
                 userId: userData._id
             })
         })
-        
+
     }
     componentDidMount() {
         AsyncStorage.getItem('myProfile').then((value) => {
             let userDataB = JSON.parse(value);
-            console.log('Profile Data >>', userDataB);
+            // console.log('Profile Data >>', userDataB);
             const userCode = userDataB.countryCod;
-            console.log('Code >>', userCode);
-            this.setState({ countryCode: userCode },()=>{
-                if(Number(this.state.countryCode) == 92){
-                    console.log('Pakistan Currency Condition ')
-                  this.setState({currency:'PKR'})
+            // console.log('Code >>', userCode);
+            this.setState({ countryCode: userCode }, () => {
+                if (Number(this.state.countryCode) == 92) {
+                    // console.log('Pakistan Currency Condition ')
+                    this.setState({ currency: 'PKR' })
                 }
                 else {
-                    console.log('USD Condition')
-                    this.setState({currency:'USD'})
+                    // console.log('USD Condition')
+                    this.setState({ currency: 'USD' })
                 }
             })
-         })
+        })
     }
 
     cardDetail = (e) => {
@@ -134,7 +143,7 @@ class Payment extends React.Component {
     }
     pay = async () => {
         const { name, email, monthArr, paymentMonth, amount, currency, creditCardNo, cvc, expiry, typeCard,
-            isLoading, serviceValidation, userId, serviceName, transactionId,date, receiptImg, receiptImgValidation } = this.state;
+            isLoading, serviceValidation, userId, serviceName, transactionId, date, receiptImg, receiptImgValidation } = this.state;
         //validation of the form
         // if (serviceValidation == "credit card") {
         //   console.log("credit card console")
@@ -292,7 +301,7 @@ class Payment extends React.Component {
         }
         if (serviceName != '' && email != '' && paymentMonth != '' && amount !=
             '' && currency != '' && date != '' && receiptImg != '') {
-            console.log('data if condition work fine')
+            // console.log('data if condition work fine')
             let paymentObj = {
                 serviceName: serviceName,
                 email: email,
@@ -300,7 +309,7 @@ class Payment extends React.Component {
                 amount: amount,
                 currency: currency,
                 // transactionId: transactionId,
-                date:date,
+                date: date,
                 receiptImg: receiptImg,
                 userId: userId
             }
@@ -310,6 +319,7 @@ class Payment extends React.Component {
             if (res.code == 200) {
                 this.setState({
                     isLoading: false,
+                    imgLoading: false,
                     dataSubmit: true,
                     isVisibleModal: true,
                     serviceName: '',
@@ -318,7 +328,7 @@ class Payment extends React.Component {
                     amount: '',
                     currency: '',
                     // transactionId: '',
-                    date:'',
+                    date: '',
                     receiptImg: ''
                 }, () => {
                     this.toastFunction(`Successfully Submit Payment`, this.state.position, DURATION.LENGTH_LONG, true)
@@ -327,6 +337,7 @@ class Payment extends React.Component {
             else {
                 this.setState({
                     isLoading: false,
+                    imgLoading: false,
                     serviceName: '',
                     email: '',
                     paymentMonth: '',
@@ -341,7 +352,7 @@ class Payment extends React.Component {
         }
         else {
             alert('Please insert all fields')
-            console.log('Esle Condition Work Because Image Is Undefined')
+            // console.log('Esle Condition Work Because Image Is Undefined')
             this.setState({
                 isLoading: false,
                 serviceName: '',
@@ -351,7 +362,7 @@ class Payment extends React.Component {
                 currency: '',
                 // transactionId: '',
                 receiptImg: '',
-                date:''
+                date: ''
             })
 
         }
@@ -403,7 +414,7 @@ class Payment extends React.Component {
     }
 
     updateServiceName = (e) => {
-        console.log(e)
+        // console.log(e)
         this.setState({
             serviceName: e
         })
@@ -456,45 +467,138 @@ class Payment extends React.Component {
             noData: true,
             mediaType: 'photo'
         }
-        ImagePicker.showImagePicker(options, async (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            }
-            else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            }
-            else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            }
-            else {
-                let timestamp = (Date.now() / 1000 | 0).toString();
-                let api_key = '878178936665133'
-                let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
-                let cloud = 'dxk0bmtei'
-                let hash_string = 'timestamp=' + timestamp + api_secret
-                let signature = CryptoJS.SHA1(hash_string).toString();
-                let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload'
-                let xhr = new XMLHttpRequest();
-                xhr.open('POST', upload_url);
-                xhr.onload = () => {
-                    let uploadData = JSON.parse(xhr._response)
+        if (Platform.OS === 'android') {
+            ImagePicker.showImagePicker(options, async (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                }
+                else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                }
+                else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                }
+                else {
+                    console.log('Image Local file >>', response);
                     this.setState({
-                        receiptImg: uploadData.secure_url
+                        uploading: true,
+                        imgLoading: true
                     })
-                };
-                let formdata = new FormData();
-                formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
-                formdata.append('timestamp', timestamp);
-                formdata.append('api_key', api_key);
-                formdata.append('signature', signature);
-                xhr.send(formdata);
-                // You can also display the image using data:
-                this.setState({
-                    attachOrange: true,
-                    shareFiles: true
-                });
-            }
-        })
+                    let timestamp = (Date.now() / 1000 | 0).toString();
+                    let api_key = '878178936665133'
+                    let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
+                    let cloud = 'dxk0bmtei'
+                    let hash_string = 'timestamp=' + timestamp + api_secret
+                    let signature = CryptoJS.SHA1(hash_string).toString();
+                    let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload'
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', upload_url);
+                    xhr.onload = () => {
+                        let uploadData = JSON.parse(xhr._response)
+                        console.log('Receipt IMG Data >>', uploadData);
+                        console.log('Upload Imag Error >>', uploadData.error);
+                        if (uploadData.error) {
+                            this.setState({
+                                uploading: false,
+                                imgLoading: false
+                            })
+                            Alert.alert(`${uploadData.error.message}`)
+                        }
+                        else {
+                            this.setState({
+                                uploading: false,
+                                imgLoading: false,
+                                receiptImg: uploadData.secure_url
+                            })
+                        }
+
+                    };
+                    let formdata = new FormData();
+                    formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
+                    formdata.append('timestamp', timestamp);
+                    formdata.append('api_key', api_key);
+                    formdata.append('signature', signature);
+                    xhr.send(formdata);
+                    // You can also display the image using data:
+                    this.setState({
+                        attachOrange: true,
+                        shareFiles: true
+                    });
+                }
+            })
+
+        }
+
+        else if (Platform.OS === 'ios') {
+            ImagePicker.showImagePicker(options, async (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                }
+                else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                }
+                else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                }
+                else {
+
+                    let path = response.uri;
+                    path = "~" + path.substring(path.indexOf("/Documents"));
+                    if (!response.fileName) {
+                        response.fileName = path.split("/").pop();
+                        // console.log('Image Local file >>', response);
+
+                    }
+                    this.setState({
+                        uploading: true,
+                        imgLoading: true
+                    })
+                    let timestamp = (Date.now() / 1000 | 0).toString();
+                    let api_key = '878178936665133'
+                    let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
+                    let cloud = 'dxk0bmtei'
+                    let hash_string = 'timestamp=' + timestamp + api_secret
+                    let signature = CryptoJS.SHA1(hash_string).toString();
+                    let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload'
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', upload_url);
+                    xhr.onload = () => {
+                        let uploadData = JSON.parse(xhr._response)
+                        // console.log('Receipt IMG Data >>', uploadData);
+                        // console.log('Upload Imag Error >>', uploadData.error);
+                        if (uploadData.error) {
+                            this.setState({
+                                uploading: false,
+                                imgLoading: false
+                            }, () => {
+                                Alert.alert(`${uploadData.error.message}`)
+                            })
+                        }
+                        else {
+                            this.setState({
+                                uploading: false,
+                                imgLoading: false,
+                                receiptImg: uploadData.secure_url
+                            })
+                        }
+
+                    };
+                    let formdata = new FormData();
+                    formdata.append('file', { uri: response.uri, type: response.type, name: response.fileName });
+                    formdata.append('timestamp', timestamp);
+                    formdata.append('api_key', api_key);
+                    formdata.append('signature', signature);
+                    xhr.send(formdata);
+                    // You can also display the image using data:
+                    this.setState({
+                        attachOrange: true,
+                        shareFiles: true
+                    });
+                }
+            })
+
+        }
+
     }
 
     render() {
@@ -522,9 +626,10 @@ class Payment extends React.Component {
             amount,
             transactionId,
             countryCode,
-            date
+            date,
+            uploading
         } = this.state;
-        console.log('Date >>', date);
+        // console.log('Date >>', date);
         // console.log('countryCode >>', countryCode , 'currency name >>',currency);
 
         return (
@@ -728,9 +833,9 @@ class Payment extends React.Component {
                                             value: 'Omni'
                                         },
                                         {
-                                            value:'Other'
+                                            value: 'Other'
                                         }
-                                    ]}
+                                        ]}
                                         dropdownOffset={{ top: 8, left: 0 }}
                                         onChangeText={this.updateServiceName}
 
@@ -798,14 +903,14 @@ class Payment extends React.Component {
                                     : null}
                             </View>
                             <View style={styles.amountContainer}>
-                            <Text style={{ color: '#4f4f4f', marginTop: 2 }}>Your currency is:</Text>
+                                <Text style={{ color: '#4f4f4f', marginTop: 2 }}>Your currency is:</Text>
                                 <View style={styles.iosPicker}>
                                     {Number(countryCode) == 92 ?
-                                        <Text style={{ marginLeft:12, marginTop:10}}>
+                                        <Text style={{ marginLeft: 12, marginTop: 10 }}>
                                             PKR
                                        </Text>
                                         :
-                                        <Text style={{ marginLeft:12, marginTop:10}}>
+                                        <Text style={{ marginLeft: 12, marginTop: 10 }}>
                                             USD
                                         </Text>
                                     }
@@ -823,29 +928,29 @@ class Payment extends React.Component {
 
                                 /> */}
                                 </View>
-                                 <View style={{marginTop:18}}>
-                                 <Text style={styles.inputLabelsStyle}>Amount</Text>
-                                 </View>
-                                <View>
-                                <TextInput placeholder="enter your amount"
-                                    style={styles.inputTextStyle}
-                                    keyboardType={"numeric"}
-                                    placeholderColor="#4f4f4f"
-                                    value={amount}
-                                    onChangeText={(amount) => this.setState({ amount })}
-                                />
+                                <View style={{ marginTop: 18 }}>
+                                    <Text style={styles.inputLabelsStyle}>Amount</Text>
                                 </View>
                                 <View>
-                                {amountValidation ?
-                                    <View>
-                                        <Text style={styles.validationInstruction}>
-                                            Please fill amount
+                                    <TextInput placeholder="enter your amount"
+                                        style={styles.inputTextStyle}
+                                        keyboardType={"numeric"}
+                                        placeholderColor="#4f4f4f"
+                                        value={amount}
+                                        onChangeText={(amount) => this.setState({ amount })}
+                                    />
+                                </View>
+                                <View>
+                                    {amountValidation ?
+                                        <View>
+                                            <Text style={styles.validationInstruction}>
+                                                Please fill amount
                                      </Text>
-                                    </View>
-                                    : null}
+                                        </View>
+                                        : null}
+                                </View>
                             </View>
-                        </View>
-                            
+
                             {/* <View>
                                 {currencyValidation ?
                                     <View>
@@ -865,29 +970,29 @@ class Payment extends React.Component {
                                     onChangeText={(transactionId) => this.setState({ transactionId })}
                                 /> */}
                                 <DatePicker
-                                style={{ width: 200 }}
-                                date={date} //initial date from state
-                                mode="date" //The enum of date, datetime and time
-                                placeholder="select date"
-                                placeholderTextColor="#7e7e7e"
-                                format="DD-MM-YYYY"
-                                minDate="01-01-1950"
-                                maxDate={date}
-                                confirmBtnText="Confirm"
-                                cancelBtnText="Cancel"
-                                customStyles={{
-                                    dateIcon: {
-                                        width: 0,
-                                        height: 0,
-                                    },
-                                    dateInput: {
-                                        backgroundColor:'white',
-                                        //opacity:0.4
-                                        color:'black'
-                                    }
-                                }}
-                                onDateChange={(date) => { this.setState({date}) }}
-                            />
+                                    style={{ width: 200 }}
+                                    date={date} //initial date from state
+                                    mode="date" //The enum of date, datetime and time
+                                    placeholder="select date"
+                                    placeholderTextColor="#7e7e7e"
+                                    format="DD-MM-YYYY"
+                                    minDate="01-01-1950"
+                                    maxDate={date}
+                                    confirmBtnText="Confirm"
+                                    cancelBtnText="Cancel"
+                                    customStyles={{
+                                        dateIcon: {
+                                            width: 0,
+                                            height: 0,
+                                        },
+                                        dateInput: {
+                                            backgroundColor: 'white',
+                                            //opacity:0.4
+                                            color: 'black'
+                                        }
+                                    }}
+                                    onDateChange={(date) => { this.setState({ date }) }}
+                                />
 
                             </View>
                             <View>
@@ -929,6 +1034,22 @@ class Payment extends React.Component {
 
                             {/* loader show */}
                             {isLoading ? <OverlayLoader /> : null}
+                            {this.state.uploading == true ?
+                                <View style={styles.spinnerContainer}>
+                                    <Spinner
+                                        //visibility of Overlay Loading Spinner
+                                        visible={this.state.imgLoading}
+                                        //Text with the Spinner 
+                                        textContent={'Uploading image ...'}
+                                        //Text style of the Spinner Text
+                                        textStyle={styles.spinnerTextStyle}
+                                        color={'#FF6200'}
+
+                                    />
+                                </View>
+                                : null
+                            }
+
                             {/* payment succesfully show modal */}
                             {dataSubmit ?
                                 <Modal

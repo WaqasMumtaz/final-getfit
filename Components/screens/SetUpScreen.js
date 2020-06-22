@@ -6,6 +6,8 @@ import HttpUtilsFile from '../Services/HttpUtils';
 import OverlayLoader from '../Loader/OverlaySpinner';
 import { Dropdown } from 'react-native-material-dropdown';
 const { heightDimension } = Dimensions.get('window');
+import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
+
 
 class Setupscreen extends React.Component {
     static navigationOptions = () => ({
@@ -204,10 +206,10 @@ class Setupscreen extends React.Component {
                 month:currentMonth,
                 year:currentYear
             }
-            console.log('send user data >>>', userData)
+            // console.log('send user data >>>', userData)
             try {
                 let sendData = await HttpUtilsFile.post('postgoal', userData);
-                console.log('data send >>>', sendData)
+                // console.log('data send >>>', sendData)
                 if (sendData.code == 200) {
                     this.setState({
                         isLoading: false
@@ -251,8 +253,9 @@ class Setupscreen extends React.Component {
             maintain,
             maintainClicked
         } = this.state;
-        console.log('your fitness result >>>', goalSteps)
+        // console.log('your fitness result >>>', goalSteps)
         return (
+            <KeyboardAwareView animated={true}>
             <View style={styles.mainContainer}>
                 <View style={styles.childContainer}>
                     <ScrollView style={{ flex: 1, backgroundColor: 'black', height: heightDimension }} contentContainerStyle={{ flexGrow: 1 }}  >
@@ -263,7 +266,7 @@ class Setupscreen extends React.Component {
                             <Text style={styles.paraGraphStyle}>GetFitAthletic needs the following info to help you with your fitness journey</Text>
                         </View>
                         <View style={styles.labelsContainer}>
-                            <Text style={styles.leftInputLabelStyle}>Height (fit)</Text>
+                            <Text style={styles.leftInputLabelStyle}>Height (ft)</Text>
                             <Text style={styles.rightInputLabelStyle}>Height (Inch)</Text>
                         </View>
                         <View style={styles.inputFieldOne}>
@@ -391,7 +394,7 @@ class Setupscreen extends React.Component {
                         </View>
 
                         <View style={styles.goalStepsContainer}>
-                            <Text style={styles.goalStepsText}>Select Goal Steps</Text>
+                            <Text style={styles.goalStepsText}>Set your daily goal steps</Text>
                         </View>
                         <View style={styles.inputFields}>
                             <TextInput onChangeText={text => {
@@ -498,6 +501,7 @@ class Setupscreen extends React.Component {
                     </ScrollView>
                 </View>
             </View>
+            </KeyboardAwareView>
         )
     }
 }

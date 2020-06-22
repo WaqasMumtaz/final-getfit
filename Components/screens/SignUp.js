@@ -25,6 +25,8 @@ const db = firebase.database();
 // import firebasePushNotification from 'react-native-firebase';
 //console.log(HttpUtilsFile)
 const { height } = Dimensions.get('window');
+import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
+
 
 class Signup extends React.Component {
     static navigationOptions = {
@@ -484,7 +486,7 @@ class Signup extends React.Component {
         //  'start >>', startNumber)
         //console.log('deviceToken >>>',deviceToken)
         return (
-
+            <KeyboardAwareView animated={true}>
             <ScrollView style={{ flex: 1, backgroundColor: 'black', height: height }} contentContainerStyle={{ flexGrow: 1 }} >
                 <View style={styles.mainContainer}>
                     <View style={styles.signUpTextContainer}>
@@ -657,6 +659,7 @@ class Signup extends React.Component {
                     <View style={{ flex: 3 }}></View>
                 </View>
             </ScrollView>
+            </KeyboardAwareView>
         )
     }
 }

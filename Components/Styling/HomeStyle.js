@@ -6,7 +6,7 @@ const styles=StyleSheet.create({
 container:{
     flex:1,
     backgroundColor:'white',
-    marginHorizontal:'7%',
+    marginHorizontal:'4%',
 },
 headingContainer:{
     height:'8%',

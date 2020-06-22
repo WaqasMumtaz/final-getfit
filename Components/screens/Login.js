@@ -16,6 +16,7 @@ import HttpUtilsFile from '../Services/HttpUtils';
 import firebase from '../../Config/Firebase';
 import firebasePushNotification from 'react-native-firebase';
 import OverlayLoader from '../Loader/OverlaySpinner';
+import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
 import 'firebase/firestore';
 const db = firebase.database();
 import Toast, { DURATION } from 'react-native-easy-toast';
@@ -330,6 +331,7 @@ getTokenPermission=()=>{
     const { navigate } = this.props.navigation;
     const { email, password, psswrdInstruction, isLoading, passwordNotMatch, psswrdNotMatchShow, emailAndPasswrd } = this.state;
     return (
+      <KeyboardAwareView animated={true}>
       <ScrollView style={{ flex: 1, backgroundColor: 'black', height: height }} contentContainerStyle={{ flexGrow: 1 }} >
         <View style={styles.loginTextContainer}>
           <Text style={styles.textLogin}>
@@ -430,6 +432,7 @@ getTokenPermission=()=>{
         </View>
         <View style={{ flex: 3 }}></View>
       </ScrollView>
+      </KeyboardAwareView>
     );
   }
 }

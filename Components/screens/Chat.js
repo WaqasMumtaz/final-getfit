@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   Text,
@@ -30,7 +30,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { YellowBox } from 'react-native';
 import firebasePushNotification from 'react-native-firebase';
 import DocumentPicker from 'react-native-document-picker';
-// import RNFetchBlob from 'rn-fetch-blob';
+import RNFetchBlob from 'rn-fetch-blob';
+console.ignoredYellowBox = ['Warning:'];
 
 // var logo  = require('../icons/logo.png');
 
@@ -45,6 +46,8 @@ console.ignoredYellowBox = ['Remote debugger'];
 const db = firebase.database();
 const CryptoJS = require('crypto-js');
 let counter = 0;
+
+
 class Chatscreen extends React.Component {
   static navigationOptions = {
     title: 'Chat',
@@ -61,7 +64,7 @@ class Chatscreen extends React.Component {
     super(props);
     this.state = {
       textMessage: '',
-      chatMessages: [],
+      chatAllMessages: [],
       sendIcon: true,
       micIcon: true,
       micOrange: false,
@@ -107,15 +110,71 @@ class Chatscreen extends React.Component {
       chatMonths: [],
       chatYear: [],
       errorMessg: '',
-      alertError: false
+      alertError: false,
+      senderImgUrl: ''
       // yesterdayDate: '',
       // deviceToken: '',
       // userToken: ''
 
     }
+    this.allFirebaseDataFunc()
+
   }
 
-  async componentDidMount() {
+  //  componentWillMount(){
+  //   this.allFirebaseDataFunc()
+
+  //  }
+
+    allFirebaseDataFunc= async ()=>{
+    const { senderData } = this.props.navigation.state.params;
+    const { navigation } = this.props;
+    let chatArrayTemp = [];
+    let dataFromLocalStorage;
+    // console.log('firebase functions >>')
+    //  this.focusListener = navigation.addListener('didFocus',  () => {
+      // console.log('Sender Data >>', senderData);
+     await AsyncStorage.getItem("currentUser").then(value => {
+          dataFromLocalStorage = JSON.parse(value);
+          // console.log('Current UserLogin >>', dataFromLocalStorage._id);
+      });
+     await db.ref('chatRoom').on("value", snapshot => {
+        let data = snapshot.val();
+        // console.log('DAta Firebase >>', data);
+        for (let i in data) {
+          let firbaseData = data[i];
+          // console.log('Firebase Database >>', firbaseData);
+          if (firbaseData.reciverId == dataFromLocalStorage._id && firbaseData.senderId == senderData.userId) {
+            console.log('If Condition chat');
+            chatArrayTemp.push(firbaseData);
+            // console.log('Chat Array >>', chatArrayTemp);
+          }
+          if (firbaseData.senderId == dataFromLocalStorage._id && firbaseData.reciverId == senderData.userId) {
+          console.log('else If Condition chat');
+            chatArrayTemp.push(firbaseData);
+            // console.log('Chat Array >>', chatArrayTemp);
+
+          }
+        }
+        this.setState({
+          userId: dataFromLocalStorage._id,
+          deviceToken: dataFromLocalStorage.deviceToken,
+          userToken: dataFromLocalStorage.token,
+          chatAllMessages: chatArrayTemp,
+          opponentId: senderData.userId,
+          opponnetAvatarSource: senderData.image,
+          name: senderData.name,
+          // time: time
+        })
+        chatArrayTemp = [];
+      });
+       this.getWeekReportData()
+
+    // })
+  }
+
+
+  componentDidMount() {
     let date = new Date().getDate();
     let month = new Date().getMonth() + 1;
     const year = new Date().getFullYear();
@@ -136,12 +195,22 @@ class Chatscreen extends React.Component {
 
     this.createNotificationListeners();
   }
-  componentWillMount() {
+
+
+  componentWillUnmount() {
+    this.notificationListener();
+    this.notificationOpenedListener();
+    // this.createNotificationListeners();
+    // this.focusListener.remove();
+
+  }
+
+
+  uplaodDataOnFirebase = (userMessage, type) => {
     const { senderData } = this.props.navigation.state.params;
-    // console.log('WillMount Data Read >>', read);
-    console.log('Sender Data >>', senderData);
-    let chatArrayTemp = [];
-    let dataFromLocalStorage;
+
+    const { todayDate, deviceToken, userToken } = this.state;
+
     const hours = new Date().getHours();
     let min = new Date().getMinutes();
     const sec = new Date().getSeconds();
@@ -186,56 +255,6 @@ class Chatscreen extends React.Component {
         time = `${hours}:${min} AM`;
       }
     }
-    AsyncStorage.getItem("currentUser").then(value => {
-      if (value) {
-        dataFromLocalStorage = JSON.parse(value);
-        console.log('Current UserLogin >>', dataFromLocalStorage._id);
-        db.ref('chatRoom').on("value", snapshot => {
-          let data = snapshot.val();
-          // console.log('DAta Firebase >>', data);
-          for (let i in data) {
-            let firbaseData = data[i];
-            // console.log('Firebase Database >>', firbaseData);
-            if (firbaseData.reciverId == dataFromLocalStorage._id && firbaseData.senderId == senderData.userId) {
-              chatArrayTemp.push(firbaseData);
-              // console.log('Chat Array >>', chatArrayTemp);
-            }
-            if (firbaseData.senderId == dataFromLocalStorage._id && firbaseData.reciverId == senderData.userId) {
-              chatArrayTemp.push(firbaseData);
-              // console.log('Chat Array >>', chatArrayTemp);
-
-            }
-          }
-          this.setState({
-            userId: dataFromLocalStorage._id,
-            deviceToken: dataFromLocalStorage.deviceToken,
-            userToken: dataFromLocalStorage.token,
-            chatMessages: chatArrayTemp,
-            opponentId: senderData.userId,
-            opponnetAvatarSource: senderData.image,
-            name: senderData.name,
-            time: time
-          })
-          chatArrayTemp = [];
-        });
-      }
-    });
-    this.getWeekReportData()
-  }
-
-  componentWillUnmount() {
-    this.notificationListener();
-    this.notificationOpenedListener();
-    // this.createNotificationListeners();
-  }
-
-
-  uplaodDataOnFirebase = (userMessage, type) => {
-    const { senderData } = this.props.navigation.state.params;
-
-    const { todayDate, time, deviceToken, userToken } = this.state;
-
-    //const { todayDate, time } = this.state;
 
     let mgs = {}
     let data;
@@ -276,9 +295,9 @@ class Chatscreen extends React.Component {
             },
             'body': JSON.stringify(body)
           }).then(function (response) {
-            console.log(response);
+            // console.log(response);
           }).catch(function (error) {
-            console.error(error);
+            // console.error(error);
           });
           db.ref(`chatRoom/`).push(mgs);
         }
@@ -310,9 +329,9 @@ class Chatscreen extends React.Component {
             },
             'body': JSON.stringify(body)
           }).then(function (response) {
-            console.log(response);
+            // console.log(response);
           }).catch(function (error) {
-            console.error(error);
+            // console.error(error);
           });
 
           db.ref(`chatRoom/`).push(mgs);
@@ -349,7 +368,7 @@ class Chatscreen extends React.Component {
           //console.log('User tapped custom button: ', response.customButton);
         }
         else {
-          console.log('Image Local url >>', response.uri);
+          // console.log('Image Local url >>', response.uri);
           this.setState({
             isLoading: true,
             imgLoading: true
@@ -361,7 +380,7 @@ class Chatscreen extends React.Component {
           let hash_string = 'timestamp=' + timestamp + api_secret
           let signature = CryptoJS.SHA1(hash_string).toString();
           let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
-          console.log('Upload URL >>', upload_url);
+          // console.log('Upload URL >>', upload_url);
           let xhr = new XMLHttpRequest();
           xhr.open('POST', upload_url);
           xhr.onload = () => {
@@ -400,93 +419,60 @@ class Chatscreen extends React.Component {
           //console.log('User tapped custom button: ', response.customButton);
         }
         else {
-          console.log('Image Local file >>', response.uri);
-          this.setState({
-            isLoading: true,
-            imgLoading: true
-          })
+
+          // this.setState({senderImg:response.uri,isLoading:false,imgLoading:false})
+          let path = response.uri;
+          path = "~" + path.substring(path.indexOf("/Documents"));
+          if (!response.fileName) {
+            response.fileName = path.split("/").pop();
+            console.log('Image Local file >>', response);
+
+          }
+
           let timestamp = (Date.now() / 1000 | 0).toString();
           let api_key = '878178936665133'
           let api_secret = 'U8W4mHcSxhKNRJ2_nT5Oz36T6BI'
+          // CLOUDINARY_URL=cloudinary://878178936665133:U8W4mHcSxhKNRJ2_nT5Oz36T6BI@dxk0bmtei
           let cloud = 'dxk0bmtei'
           let myPresetKey = 'wtoutud8';
           let secndPresetKey = 'toh6r3p2'
           let hash_string = 'timestamp=' + timestamp + api_secret
           let signature = CryptoJS.SHA1(hash_string).toString();
           // console.log('Signature >>', signature);
-          let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/upload';
-          //  console.log('Upload URL >>', upload_url);
+          let upload_url = 'https://api.cloudinary.com/v1_1/' + cloud + '/image/upload';
+          // console.log('Upload URL >>', upload_url);
           let xhr = new XMLHttpRequest();
 
           // console.log('XHR Url >>', xhr);
           xhr.open('POST', upload_url);
+          this.setState({
+            isLoading: true,
+            imgLoading: true
+          })
           xhr.onload = () => {
-            let uploadData = JSON.parse(xhr._response)
-            console.log('UploadDAta >>', uploadData);
-            console.log('Upload Imag Error >>', uploadData.error);
+            let uploadData = JSON.parse(xhr.response);
+            // console.log('UploadDAta >>', uploadData);
+            // console.log('Upload Imag Error >>', uploadData.error);
             if (uploadData.error) {
               this.setState({
                 isLoading: false,
                 imgLoading: false
+              }, () => {
+                Alert.alert(`${uploadData.error.message}`)
               })
-              Alert.alert(`${uploadData.error.message}`)
             }
             else {
               this.setState({
                 isLoading: false,
-                imgLoading: false
+                imgLoading: false,
+                // senderImgUrl: uploadData.secure_url
+              }, () => {
+                this.uplaodDataOnFirebase(uploadData, 'image');
+
               })
-              this.uplaodDataOnFirebase(uploadData, 'image');
 
             }
-            // if(uploadData){
-            //   this.setState({
-            //     isLoading:false,
-            //     imgLoading:false
-            //   },()=>{
-            //     console.log('If Condition Callback >>', uploadData.error)
-            //     if(uploadData.error){
-            //     Alert.alert(`${uploadData.error.message}`);
-            //     this.setState({
-            //       isLoading:false,
-            //       imgLoading:false
-            //     })
-            //   }
 
-            //   })
-            //   // if(uploadData.error){
-            //   //   Alert.alert(`${uploadData.error.message}`)
-            //   // }
-            // }
-            // if(uploadData.error){
-            //     Alert.alert(`${uploadData.error.message}`)
-            // }
-            // if(uploadData && !uploadData.error) {
-            //   this.setState({
-            //     isLoading:false,
-            //     imgLoading:false
-            //   },()=>{
-            //       this.uplaodDataOnFirebase(uploadData, 'image');
-            //   })
-            // }
-
-
-
-            // if(uploadData.error){
-            //   this.setState({
-            //     isLoading:false,
-            //     imgLoading:false
-            //   })
-            //   Alert.alert(`${uploadData.error.message}`)
-            // }
-            // else {
-            //   console.log('UploadDAta >>', uploadData);
-            //   this.uplaodDataOnFirebase(uploadData, 'image');
-            //   this.setState({
-            //     isLoading:false,
-            //     imgLoading:false
-            //   })
-            // }
           };
 
           let formdata = new FormData();
@@ -504,20 +490,6 @@ class Chatscreen extends React.Component {
       })
     }
   }
-
-  // upLoadFile=(file)=>{
-  //   console.log('UploadFile Function >>', file)
-  //   let cloud = 'dxk0bmtei'
-  //   let myPresetKey = 'wtoutud8';
-  //   let secndPresetKey = 'toh6r3p2';
-  //   RNFetchBlob.fetch('POST', 'https://api.cloudinary.com/v1_1/' + cloud + '/image/upload?upload_preset=' + myPresetKey, {
-  //     'Content-Type': 'multipart/form-data'
-  //       }, [
-  //         { name: 'file', filename: file.fileName, data: RNFetchBlob.wrap(file.origURL),
-  //        }
-  //     ])
-
-  // }
 
   fileUpload = async (e) => {
     const options = {
@@ -638,7 +610,7 @@ class Chatscreen extends React.Component {
   }
 
   expandImg = (e) => {
-    console.log('Expand Uri >>', e)
+    // console.log('Expand Uri >>', e)
     this.setState({
       expand: true,
       isVisibleModal: true,
@@ -659,9 +631,9 @@ class Chatscreen extends React.Component {
     Linking.openURL(
       FilePath
     ).then((msg) => {
-      console.log(msg, 'success!!')
+      // console.log(msg, 'success!!')
     }, (err) => {
-      console.log(err, 'error!!')
+      // console.log(err, 'error!!')
     });
 
   }
@@ -872,7 +844,7 @@ class Chatscreen extends React.Component {
   //Push Notification Methods here 
 
   createNotificationListeners = async () => {
-    console.log('Create Notification Listeners run ');
+    // console.log('Create Notification Listeners run ');
     // console.log('Firebase >>', firebasePushNotification);
     /*
     * Triggered when a particular notification has been received in foreground
@@ -934,25 +906,16 @@ class Chatscreen extends React.Component {
 
 
   render() {
-    const { textMessage, sendIcon, sendBtnContainer, recodringBody, attachGray, attachOrange, shareFiles,
+    const { chatAllMessages, senderImgUrl, textMessage, sendIcon, sendBtnContainer, recodringBody, attachGray, attachOrange, shareFiles,
       expand, userId, opponentId, opponnetAvatarSource, name, imagePath, monthName, yesterdayDate, todayDate } = this.state;
     let dateNum;
     let month;
     let year;
     let showDate;
-    console.log('todayDate >>', todayDate)
+    // console.log('opponnetAvatarSource >>', opponnetAvatarSource);
+    //  console.log('todayDate >>', todayDate);
 
-    //let userImg;
-    // AsyncStorage.getItem('userSendImg').then(value =>{
-    //   JSON.parse(value);
-    // })
-    // AsyncStorage.getItem("userSendImg").then(value => {
-    //   if (value) {
-    //     userImg = JSON.parse(value);
-    //   console.log('User Image LocalStorage >>', userImg);
-    //   }
-    // });
-    const chatMessages = this.state.chatMessages.map((message, key) => {
+    const chatMessages = chatAllMessages && chatAllMessages.map((message, key) => {
       // console.log('chat messages array show >>',message);
       // const a = Number(counter)+1;
       // console.log('Mesg count >>', a);
@@ -989,7 +952,7 @@ class Chatscreen extends React.Component {
       year = Number(message.date.slice(6));
 
       return (
-        <View>
+        <View key={key}>
           {showDate != '' ?
             <View style={styles.dateView}>
               <Text style={styles.dateTxt}>{showDate}</Text>
@@ -1004,13 +967,13 @@ class Chatscreen extends React.Component {
               <View style={styles.timeAndCheck}>
                 <Text style={styles.timeText}>{message.time}</Text>
                 {message.status == 'seen' ?
-                  <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                  <Text style={{ color: 'blue', marginLeft: 5 }} key={key}>_/_/</Text>
                   : message.status == 'delivered' ?
-                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/_/</Text>
                     : message.status == 'sent' ?
-                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                    :
-                    null
+                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/</Text>
+                      :
+                      null
                 }
               </View>
             </View>
@@ -1019,24 +982,26 @@ class Chatscreen extends React.Component {
               <TouchableOpacity activeOpacity={0.5}
                 style={styles.showPhotoContainer}
                 onPress={this.expandImg.bind(this, message.message.secure_url)}
+                key={key}
               >
                 {/* {console.log('message image >>', message.message)} */}
 
                 <Image key={key} style={styles.mgsImges} source={{
                   uri: `${message.message.secure_url}`
-                }
-                } />
+                }} 
+                />
+               
                 {/* <Text style={styles.timeText}>{message.time}</Text> */}
                 <View style={styles.timeAndCheck}>
                   <Text style={styles.timeText}>{message.time}</Text>
                   {message.status == 'seen' ?
-                    <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                    <Text style={{ color: 'blue', marginLeft: 5 }} key={key}>_/_/</Text>
                     : message.status == 'delivered' ?
-                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
+                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/_/</Text>
                       : message.status == 'sent' ?
-                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                      :
-                      null
+                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/</Text>
+                        :
+                        null
 
                   }
                 </View>
@@ -1047,6 +1012,7 @@ class Chatscreen extends React.Component {
                   <TouchableOpacity activeOpacity={0.5}
                     style={styles.mgsTouctable}
                     onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                    key={key}
                   >
                     <View>
                       <View style={styles.fileTagStyle}>
@@ -1063,22 +1029,23 @@ class Chatscreen extends React.Component {
                   <View style={styles.timeAndCheck}>
                     <Text style={styles.timeText}>{message.time}</Text>
                     {message.status == 'seen' ?
-                      <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                      <Text style={{ color: 'blue', marginLeft: 5 }} key={key}>_/_/</Text>
                       : message.status == 'delivered' ?
-                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
-                        :message.status == 'sent' ?
-                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                        :
-                        null
+                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/_/</Text>
+                        : message.status == 'sent' ?
+                          <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/</Text>
+                          :
+                          null
                     }
                   </View>
                 </View>
                 :
                 message.senderId == userId && message.type == 'txt' ?
-                  <View>
+                  <View key={key}>
                     <TouchableOpacity activeOpacity={0.5}
                       style={styles.mgsTouctable}
                       onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                      key={key}
                     >
                       <View style={styles.fileTagStyle}>
                         <View style={styles.extensionFile}>
@@ -1096,6 +1063,7 @@ class Chatscreen extends React.Component {
                       <TouchableOpacity activeOpacity={0.5}
                         style={styles.mgsTouctable}
                         onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                        key={key}
                       >
                         <View style={styles.fileTagStyle}>
                           <View style={styles.extensionFile}>
@@ -1110,10 +1078,10 @@ class Chatscreen extends React.Component {
                             <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
                             : message.status == 'delivered' ?
                               <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
-                              :message.status == 'sent' ?
-                              <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                              :
-                              null
+                              : message.status == 'sent' ?
+                                <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                :
+                                null
 
                           }
                         </View>
@@ -1125,6 +1093,7 @@ class Chatscreen extends React.Component {
                         <TouchableOpacity activeOpacity={0.5}
                           style={styles.mgsTouctable}
                           onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                          key={key}
                         >
                           <View style={styles.fileTagStyle}>
                             <View style={styles.extensionFile}>
@@ -1140,9 +1109,9 @@ class Chatscreen extends React.Component {
                               : message.status == 'delivered' ?
                                 <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
                                 : message.status == 'sent' ?
-                                <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                                :
-                                null
+                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                  :
+                                  null
 
                             }
                           </View>
@@ -1154,6 +1123,7 @@ class Chatscreen extends React.Component {
                           <TouchableOpacity activeOpacity={0.5}
                             style={styles.mgsTouctable}
                             onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                            key={key}
                           >
                             <View style={styles.fileTagStyle}>
                               <View style={styles.extensionFile}>
@@ -1168,10 +1138,10 @@ class Chatscreen extends React.Component {
                                 <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
                                 : message.status == 'delivered' ?
                                   <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
-                                  :message.status == 'sent' ?
-                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                                  :
-                                  null
+                                  : message.status == 'sent' ?
+                                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                    :
+                                    null
 
                               }
                             </View>
@@ -1184,6 +1154,7 @@ class Chatscreen extends React.Component {
                             <TouchableOpacity activeOpacity={0.5}
                               style={styles.mgsTouctable}
                               onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                              key={key}
                             >
                               <View style={styles.fileTagStyle}>
                                 <View style={styles.extensionFile}>
@@ -1199,10 +1170,10 @@ class Chatscreen extends React.Component {
                                 <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
                                 : message.status == 'delivered' ?
                                   <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
-                                  :message.status == 'sent' ?
-                                  <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                                  :
-                                  null
+                                  : message.status == 'sent' ?
+                                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                    :
+                                    null
 
                               }
                             </View>
@@ -1227,10 +1198,10 @@ class Chatscreen extends React.Component {
                                   <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
                                   : message.status == 'delivered' ?
                                     <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
-                                    :message.status == 'sent' ?
-                                    <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                                    :
-                                    null
+                                    : message.status == 'sent' ?
+                                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
+                                      :
+                                      null
 
                                 }
                               </View>
@@ -1245,23 +1216,23 @@ class Chatscreen extends React.Component {
                                     message.message.weekExcercise.map((elem, key) => {
                                       return (
                                         <View style={styles.exerciseResultCard}>
-                                          <Text style={styles.resultHeading}>
+                                          <Text style={styles.resultHeading} key={key}>
                                             {elem.exerciseName}
                                           </Text>
                                           <View style={styles.dataResultParent}>
                                             <View style={styles.timeShowContainer}>
-                                              <Text style={styles.timeShow}>
+                                              <Text style={styles.timeShow} key={key}>
                                                 {`${elem.exerciseAmount} ${elem.exerciseUnit}`}
                                               </Text>
                                             </View>
-                                            <View style={styles.dateAndMonth}>
+                                            <View style={styles.dateAndMonth} key={key}>
                                               <Text maxLength={3} style={styles.dateAndMonthShow}>
                                                 {elem.monthName}
                                               </Text>
-                                              <Text style={styles.dateNumber}>
+                                              <Text style={styles.dateNumber} key={key}>
                                                 {elem.dayOfMonth}
                                               </Text>
-                                              <Text style={styles.superScriptTextStyle}>
+                                              <Text style={styles.superScriptTextStyle} key={key}>
                                                 {elem.dayOfMonth == 1 ? 'st' : elem.dayOfMonth == 2 ? '2nd' : elem.dayOfMonth == 3 ? 'rd' : 'th'}
                                               </Text>
                                             </View>
@@ -1272,48 +1243,51 @@ class Chatscreen extends React.Component {
                                   }
                                 </View>
                                 <View style={styles.weightStatus}>
-                                  <Text style={styles.headingText}>Weight{'\n'}status</Text>
+                                  <Text style={styles.headingText} key={key}>Weight{'\n'}status</Text>
                                   <View style={styles.statusGraphContainer}>
                                     <View style={styles.midBox}>
-                                      <ChartScreen lastWeek={message.message.weight.lastWeek} cureentWeek={message.message.weight.cureentWeek} />
+                                      <ChartScreen lastWeek={message.message.weight.lastWeek}
+                                        cureentWeek={message.message.weight.cureentWeek}
+                                        key={key}
+                                      />
                                     </View>
                                     <View style={styles.borderLines1}>
-                                      <Text style={styles.kgTextOne}>
+                                      <Text style={styles.kgTextOne} key={key}>
                                         {message.message.weight.currentDateDataWeights.weight}
                                       </Text>
-                                      <Text style={styles.kgTextTwo}>
+                                      <Text style={styles.kgTextTwo} key={key}>
                                         {message.message.weight.weekAgoDateDataWeights.weight}
                                       </Text>
                                     </View>
                                     <View style={styles.weeksTextContainer}>
-                                      <Text style={styles.thisWeek}>This week</Text>
-                                      <Text style={styles.lastWeek}>Last week</Text>
+                                      <Text style={styles.thisWeek} key={key}>This week</Text>
+                                      <Text style={styles.lastWeek} key={key}>Last week</Text>
                                     </View>
                                     {message.message.weight.loseWeight || message.message.weight.loseWeight == 0
                                       || message.message.weight.loseWeight != undefined ?
                                       <View>
-                                        <Text style={styles.lostKg}>{`${message.message.weight.loseWeight} KG`} </Text>
+                                        <Text style={styles.lostKg} key={key}>{`${message.message.weight.loseWeight} KG`} </Text>
                                         <Text style={styles.lostText}>Lost</Text>
                                       </View>
                                       :
                                       <View>
-                                        <Text style={styles.lostKg}>{`${message.message.weight.gainWeight} KG`} </Text>
-                                        <Text style={styles.lostText}>Gain</Text>
+                                        <Text style={styles.lostKg} key={key}>{`${message.message.weight.gainWeight} KG`} </Text>
+                                        <Text style={styles.lostText} key={key}>Gain</Text>
                                       </View>
                                     }
                                   </View>
                                 </View>
                                 {/* <Text style={styles.timeText}>{message.time}</Text> */}
                                 <View style={styles.timeAndCheck}>
-                                  <Text style={styles.timeText}>{message.time}</Text>
+                                  <Text style={styles.timeText} key={key}>{message.time}</Text>
                                   {message.status == 'seen' ?
-                                    <Text style={{ color: 'blue', marginLeft: 5 }}>_/_/</Text>
+                                    <Text style={{ color: 'blue', marginLeft: 5 }} key={key}>_/_/</Text>
                                     : message.status == 'delivered' ?
-                                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/_/</Text>
-                                      :message.status == 'sent' ?
-                                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }}>_/</Text>
-                                      :
-                                      null
+                                      <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/_/</Text>
+                                      : message.status == 'sent' ?
+                                        <Text style={{ color: '#A6A6A6', marginLeft: 5 }} key={key}>_/</Text>
+                                        :
+                                        null
 
                                   }
                                 </View>
@@ -1334,10 +1308,13 @@ class Chatscreen extends React.Component {
               <TouchableOpacity activeOpacity={0.5}
                 style={styles.replyshowPhotoContainer}
                 onPress={this.expandImg.bind(this, message.message.secure_url)}
+                key={key}
               >
                 <Image key={key} style={styles.replymgsImges} source={{
                   uri: `${message.message.secure_url}`
-                }} />
+                }}
+
+                />
                 <Text style={styles.timeTextReply}>{message.time}</Text>
               </TouchableOpacity>
               :
@@ -1346,6 +1323,7 @@ class Chatscreen extends React.Component {
                   <TouchableOpacity activeOpacity={0.5}
                     style={styles.replymgsTouctable}
                     onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                    key={key}
                   >
                     <View style={styles.replyfileTagStyle}>
                       <View style={styles.replyextensionFile}>
@@ -1362,6 +1340,7 @@ class Chatscreen extends React.Component {
                     <TouchableOpacity activeOpacity={0.5}
                       style={styles.replymgsTouctable}
                       onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                      key={key}
                     >
                       <View style={styles.replyfileTagStyle}>
                         <View style={styles.replyextensionFile}>
@@ -1378,6 +1357,7 @@ class Chatscreen extends React.Component {
                       <TouchableOpacity activeOpacity={0.5}
                         style={styles.replymgsTouctable}
                         onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                        key={key}
                       >
                         <View style={styles.replyfileTagStyle}>
                           <View style={styles.replyextensionFile}>
@@ -1394,6 +1374,7 @@ class Chatscreen extends React.Component {
                         <TouchableOpacity activeOpacity={0.5}
                           style={styles.replymgsTouctable}
                           onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                          key={key}
                         >
                           <View style={styles.replyfileTagStyle}>
                             <View style={styles.replyextensionFile}>
@@ -1410,6 +1391,7 @@ class Chatscreen extends React.Component {
                           <TouchableOpacity activeOpacity={0.5}
                             style={styles.replymgsTouctable}
                             onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                            key={key}
                           >
                             <View style={styles.replyfileTagStyle}>
                               <View style={styles.replyextensionFile}>
@@ -1427,6 +1409,7 @@ class Chatscreen extends React.Component {
                             <TouchableOpacity activeOpacity={0.5}
                               style={styles.replymgsTouctable}
                               onPress={this.fileOpner.bind(this, message.message.secure_url, message.type)}
+                              key={key}
                             >
                               <View style={styles.replyfileTagStyle}>
                                 <View style={styles.replyextensionFile}>
@@ -1463,23 +1446,29 @@ class Chatscreen extends React.Component {
                                     message.message.weekExcercise.map((elem, key) => {
                                       return (
                                         <View style={styles.replyexerciseResultCard}>
-                                          <Text style={styles.replyresultHeading}>
+                                          <Text style={styles.replyresultHeading}
+                                            key={key}
+                                          >
                                             {elem.exerciseName}
                                           </Text>
-                                          <View style={styles.replydataResultParent}>
+                                          <View style={styles.replydataResultParent}
+                                            key={key}
+
+                                          >
                                             <View style={styles.replytimeShowContainer}>
                                               <Text style={styles.replytimeShow}>
                                                 {`${elem.exerciseAmount} ${elem.exerciseUnit}`}
                                               </Text>
                                             </View>
-                                            <View style={styles.replydateAndMonth}>
+
+                                            <View style={styles.replydateAndMonth} key={key}>
                                               <Text maxLength={3} style={styles.replydateAndMonthShow}>
                                                 {elem.monthName}
                                               </Text>
-                                              <Text style={styles.replydateNumber}>
+                                              <Text style={styles.replydateNumber} key={key}>
                                                 {elem.dayOfMonth}
                                               </Text>
-                                              <Text style={styles.replysuperScriptTextStyle}>
+                                              <Text style={styles.replysuperScriptTextStyle} key={key}>
                                                 {elem.dayOfMonth == 1 ? 'st' : elem.dayOfMonth == 2 ? '2nd' : elem.dayOfMonth == 3 ? 'rd' : 'th'}
                                               </Text>
                                             </View>
@@ -1490,38 +1479,42 @@ class Chatscreen extends React.Component {
                                   }
                                 </View>
                                 <View style={styles.replyweightStatus}>
-                                  <Text style={styles.replyheadingText}>Weight{'\n'}status</Text>
+                                  <Text style={styles.replyheadingText} key={key}>Weight{'\n'}status</Text>
                                   <View style={styles.replystatusGraphContainer}>
                                     <View style={styles.replymidBox}>
-                                      <ChartScreen lastWeek={message.message.weight.lastWeek} cureentWeek={message.message.weight.cureentWeek} />
+                                      <ChartScreen lastWeek={message.message.weight.lastWeek}
+                                        cureentWeek={message.message.weight.cureentWeek}
+                                        key={key}
+                                      />
                                     </View>
                                     <View style={styles.replyborderLines1}>
-                                      <Text style={styles.replykgTextOne}>
+
+                                      <Text style={styles.replykgTextOne} key={key}>
                                         {message.message.weight.currentDateDataWeights.weight}
                                       </Text>
-                                      <Text style={styles.replykgTextTwo}>
+                                      <Text style={styles.replykgTextTwo} key={key}>
                                         {message.message.weight.weekAgoDateDataWeights.weight}
                                       </Text>
                                     </View>
                                     <View style={styles.replyweeksTextContainer}>
-                                      <Text style={styles.replythisWeek}>This week</Text>
-                                      <Text style={styles.replylastWeek}>Last week</Text>
+                                      <Text style={styles.replythisWeek} key={key}>This week</Text>
+                                      <Text style={styles.replylastWeek} key={key}>Last week</Text>
                                     </View>
                                     {message.message.weight.loseWeight || message.message.weight.loseWeight == 0
                                       || message.message.weight.loseWeight != undefined ?
                                       <View>
-                                        <Text style={styles.replylostKg}>{`${message.message.weight.loseWeight} KG`} </Text>
-                                        <Text style={styles.replylostText}>Lost</Text>
+                                        <Text style={styles.replylostKg} key={key}>{`${message.message.weight.loseWeight} KG`} </Text>
+                                        <Text style={styles.replylostText} key={key}>Lost</Text>
                                       </View>
                                       :
                                       <View>
-                                        <Text style={styles.replylostKg}>{`${message.message.weight.gainWeight} KG`} </Text>
-                                        <Text style={styles.replylostText}>Gain</Text>
+                                        <Text style={styles.replylostKg} key={key}>{`${message.message.weight.gainWeight} KG`} </Text>
+                                        <Text style={styles.replylostText} key={key}>Gain</Text>
                                       </View>
                                     }
                                   </View>
                                 </View>
-                                <Text style={styles.timeTextReply}>{message.time}</Text>
+                                <Text style={styles.timeTextReply} key={key}>{message.time}</Text>
                               </View >
                               : null
           }
@@ -1533,16 +1526,17 @@ class Chatscreen extends React.Component {
       <KeyboardAwareView animated={true}>
         <View style={styles.mainContainer}>
           <View style={styles.childMainContainer}>
-            {opponnetAvatarSource != undefined ?
+            {opponnetAvatarSource != undefined && opponnetAvatarSource != '' && name != '' ?
               <View style={styles.chatProfileContainer}>
                 <Text style={styles.profileNameStyle}>{name}</Text>
                 <TouchableOpacity activeOpacity={0.5} onPress={this.checkProfile}>
                   <Image source={{ uri: `${opponnetAvatarSource}` }} style={styles.profilPicStyle} />
                 </TouchableOpacity>
+
               </View>
               :
               <View style={styles.chatProfileContainer}>
-                <Text style={styles.profileNameStyle}>{name}</Text>
+                {name != '' ? <Text style={styles.profileNameStyle}>{name}</Text> : <Text>Searching...</Text>}
                 <TouchableOpacity activeOpacity={0.5} onPress={this.checkProfile}>
                   <Image source={require('../icons/profile.png')} style={styles.profilPicStyle} />
                 </TouchableOpacity>

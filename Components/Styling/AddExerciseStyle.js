@@ -14,8 +14,14 @@ const styles =StyleSheet.create({
      },
      headingContainer:{
          flex:0.5,
-         height:'6%',
+        //  height:'6%',
+         marginTop:12
          //backgroundColor:'red'
+     },
+     
+     textTodayStyle:{
+         fontSize:14,
+         marginTop:5
      },
      headingStyle:{
          fontSize:20,

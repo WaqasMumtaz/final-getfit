@@ -19,6 +19,13 @@ const styles = StyleSheet.create({
     //     marginRight:30,
     //     marginBottom:8
     // },
+    spinnerContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    spinnerTextStyle: {
+        color: '#FF6200',
+    },
     iosPicker:{
         height:40,
         backgroundColor:'#e5e5e5',

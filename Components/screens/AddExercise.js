@@ -1,6 +1,8 @@
 import React from 'react';
-import { Text, View, Alert,
-    ScrollView, Image, Dimensions, TouchableOpacity, Picker } from 'react-native';
+import {
+    Text, View, Alert,
+    ScrollView, Image, Dimensions, TouchableOpacity, Picker
+} from 'react-native';
 import styles from '../Styling/AddExerciseStyle';
 import BriskScreen from '../screens/BriskScreen';
 // import AsyncStorage from 'react-native';
@@ -66,7 +68,7 @@ class AddExercise extends React.Component {
             briskExerciseAmount: '',
             exerciseArr: [],
             inputs: {},
-            customInputs:{},
+            customInputs: {},
             amountExcercise: '',
             indexNumber: {},
             units: {},
@@ -135,14 +137,7 @@ class AddExercise extends React.Component {
         } = this.state;
         const { navigate } = this.props.navigation;
         let dataArr = [];
-        // let data = this.state.customInputs;
-        // const value='';
-        // for(let key in data){
-        //     if(data.hasOwnProperty(key)) {
-        //       value = data[key];
-        //         //do something with value;
-        //     }
-        // }
+        
         for (let i in uniqeArray) {
             const exerciseObj = {};
             exerciseObj.date = date;
@@ -151,20 +146,20 @@ class AddExercise extends React.Component {
             exerciseObj.month = month;
             exerciseObj.year = year;
             exerciseObj.userId = userId;
-            exerciseObj['exerciseName'] =uniqeArray[i] != 'Add Custom Exercise' ? uniqeArray[i] : this.state.customInputs['Add Custom Exercise'];
+            exerciseObj['exerciseName'] = uniqeArray[i] != 'Add Custom Exercise' ? uniqeArray[i] : this.state.customInputs['Add Custom Exercise'];
             exerciseObj['exerciseAmount'] = inputs[uniqeArray[i]];
             exerciseObj['exerciseUnit'] = units[uniqeArray[i]];
             dataArr.push(exerciseObj)
         }
-        console.log('Data Array Length >>', dataArr.length);
+        // console.log('Data Array Length >>', dataArr.length);
         if (dataArr.length > 0) {
             AsyncStorage.setItem('logExercises', JSON.stringify(dataArr))
             this.toastFunction('Data Save Successfully', this.state.position, DURATION.LENGTH_LONG, true);
             navigate('Exerciselog');
             exerciseArry = [];
         }
-       else if(dataArr.length <= 0 || this.state.customInputs['Add Custom Exercise'] == '' 
-        && customExName == '' && customExUnit == '') {
+        else if (dataArr.length <= 0 || this.state.customInputs['Add Custom Exercise'] == ''
+            && customExName == '' && customExUnit == '') {
             Alert.alert('Please Add Exercise')
         }
     }
@@ -193,100 +188,26 @@ class AddExercise extends React.Component {
             }
         })
     }
-     
-    setCustomExeName= (index, text)=>{
-         this.setState({
-             customInputs:{
-                 ...this.state.customInputs,
-                 [index]:text
-             }
-         })
+
+    setCustomExeName = (index, text) => {
+        this.setState({
+            customInputs: {
+                ...this.state.customInputs,
+                [index]: text
+            }
+        })
     }
 
     increamentVal(data, item) {
-        // let emptyArr={}
-        // console.log('inc data >',Number(data))
-        // console.log('item value >', item)
+        
         const inputValue = Number(data) + 1;
         const incValue = inputValue.toString();
-        console.log(incValue);
-        // const a=this.state.inputs;
-        // this.setState({
-        //     incInputValue:incValue
-        // })
-        // for(var i in this.state.inputs){
-        //    console.log(this.state.inputs[i])
-        //    const a =this.state.inputs[i];
-        //    this.setState({
-        //        inputs:incValue
-        //    })
-        // }
-        // console.log([item]);
-        //console.log('increment value',incValue)
-        //const a =this.state.inputs(...)
-        // this.setState({
-        //     inputs:{
-        //         [item]:incValue
-
-        //     }
-        // })
-        // if(data == 'Brisk Walk'){
-        //     for(var i in this.state.inputs){
-        //             console.log(this.state.inputs[i])
-        //           const inputValue =  this.state.inputs[i]
-        //           const a= Number(inputValue)+ 1;
-        //           const amountVal = a.toString()
-        //           console.log(a)
-        //           this.setState({
-        //               inputs:{
-        //                   [data]:amountVal
-        //               }
-        //           })
-        //         //     if(data == this.state.inputs[i]){
-        //         //         console.log('true')
-        //         //     }
-        //      }
+        // console.log(incValue);
+       
 
     }
 
-    //     else if (data == 'High paced jogging') {
-    //         for(var i in this.state.inputs){
-    //             console.log(this.state.inputs[i])
-    //           const inputValue =  this.state.inputs[i]
-    //           const a= Number(inputValue)+ 1;
-    //           const amountVal = a.toString()
-    //           console.log(a)
-    //           this.setState({
-    //               inputs:{
-    //                   [data]:amountVal
-    //               }
-    //           })
-    //         //     if(data == this.state.inputs[i]){
-    //         //         console.log('true')
-    //         //     }
-    //      }
-
-    //  }
-    //     //  allObjArr.push(...this.state.inputs);
-    //  console.log('all objects >', allObjArr)
-    // console.log('state value >>', this.state.inputs ,'data >', data)
-    // 
-
-
-    // console.log('inc value >>',data === 'Brisk Walk', 'index >>',index == 0)
-    // if (data == 0) {
-    //     console.log('exercise amount >>', this.state.exerciseAmount)
-    //     console.log('amount', this.state)
-    // const { exerciseAmount } = this.state;
-    // const amount = Number(exerciseAmount) + 1
-    // let amountVal = amount.toString()
-    // this.setState({
-    //     exerciseAmount: amountVal
-    // })
-    //}
-    // else if( )
-
-    //}
+    
     decrementVal = () => {
         const { exerciseAmount } = this.state;
         const amount = Number(exerciseAmount) - 1
@@ -366,113 +287,72 @@ class AddExercise extends React.Component {
 
         uniqeArray = exerciseArry.filter(onlyUnique);
         // const b = this.state.allExerciseName;
-        console.log('State Excercise Name >>', this.state.customInputs);
+        // console.log('State Excercise Name >>', this.state.customInputs);
         return (
             <KeyboardAwareView animated={true}>
-            <ScrollView style={{ flex: 1, backgroundColor: 'white', height: height }} contentContainerStyle={{ flexGrow: 1 }}  >
-                <View style={styles.childContainer}>
-                    <View style={styles.headingContainer}>
-                        <Text style={styles.headingStyle}>
-                            Add Exercise
+                <ScrollView style={{ flex: 1, backgroundColor: 'white', height: height }} contentContainerStyle={{ flexGrow: 1 }}  >
+                    <View style={styles.childContainer}>
+                        <View style={styles.headingContainer}>
+                            <Text style={styles.headingStyle}>
+                                Add Exercise
                         </Text>
-                    </View>
-                    <Text style={{ color: '#A6A6A6', marginVertical: 5 }}>Select Exercise</Text>
-                    <View style={{
-                        height: 40, borderWidth: 2, borderColor: '#e5e5e5',
-                        borderBottomWidth: 0
-                    }}>
-                        <Dropdown
-                            // label='Select an option..'
-                            value={this.state.allExerciseName}
-                            data={data}
-                            dropdownOffset={{ top: 7, left: 0 }}
-                            onChangeText={this.selectExercise}
-                            // dropdownPosition={}
-                            itemCount={8}
+                            <Text style={styles.textTodayStyle}>Enter today’s exercise details.</Text>
 
+                        </View>
+                        {/* <View style={styles.todayText}>
+                    </View> */}
+                        <Text style={{ color: '#A6A6A6', marginVertical: 5 }}>Select Exercise</Text>
+                        <View style={{
+                            height: 40, borderWidth: 2, borderColor: '#e5e5e5',
+                            borderBottomWidth: 0
+                        }}>
+                            <Dropdown
+                                // label='Select an option..'
+                                value={this.state.allExerciseName}
+                                data={data}
+                                dropdownOffset={{ top: 7, left: 0 }}
+                                onChangeText={this.selectExercise}
+                                // dropdownPosition={}
+                                itemCount={8}
+
+                            />
+                        </View>
+                        {
+                            uniqeArray.length >= 0 ?
+                                uniqeArray.map((item, index) => {
+                                    return <View style={{ marginTop: 20 }} key={index}>
+                                        <BriskScreen title={item}
+                                            backFunc={this.backToHome.bind(this, item)}
+                                            setAmount={(text) => this.setAmount(item, text)}
+                                            setCustomExeName={(text) => this.setCustomExeName(item, text)}
+                                            value2={this.state.customInputs[item]}
+                                            value={this.state.inputs[item]}
+                                            increamentVal={this.increamentVal.bind(this, this.state.inputs[item], item)}
+                                            //decrementVal={this.decrementVal}
+                                            updateUnit={(text) => this.updateUnit(item, text)}
+                                            indexNumber={indexNumber}
+                                            unit={this.state.units[item]} />
+                                    </View>
+                                })
+                                :
+                                null
+                        }
+                        <Toast ref="toastWithStyle"
+                            style={{ backgroundColor: '#FF6200' }}
+                            position={this.state.position}
+                            positionValue={50}
+                            fadeInDuration={750}
+                            fadeOutDuration={1000}
+                            opacity={0.8}
+                            textStyle={{ color: 'white' }}
                         />
+                        <View style={{ flex: 2 }}>
+                        </View>
                     </View>
-                    {
-                        uniqeArray.length >= 0 ?
-                            uniqeArray.map((item, index) => {
-                                return  <View style={{ marginTop: 20 }} key={index}>
-                                <BriskScreen title={item}
-                                    backFunc={this.backToHome.bind(this, item)}
-                                    setAmount={(text) => this.setAmount(item, text)}
-                                    setCustomExeName={(text)=>this.setCustomExeName(item, text)}
-                                    value2={this.state.customInputs[item]}
-                                    value={this.state.inputs[item]}
-                                    increamentVal={this.increamentVal.bind(this, this.state.inputs[item], item)}
-                                    //decrementVal={this.decrementVal}
-                                    updateUnit={(text) => this.updateUnit(item, text)}
-                                    indexNumber={indexNumber}
-                                    unit={this.state.units[item]} />
-                            </View>
-                                    
-                                        //item == 'Add Custom Exercise' ?
-                                            // <View
-                                            //     style={{ marginTop: 20 }}
-                                            //     key={index}
-                                            //     backgroundColor='black'
-                                            //     height={123}
-                                            //     padding={10}
-                                            // >
-                                            //     <View style={styles.customInput}>
-                                            //         <TextInput
-                                            //             style={styles.customInputStyle}
-                                            //             placeholder="Enter Custom Exercis Name"
-                                            //             placeholderTextColor="black"
-                                            //             onChangeText={(text) => this.setState({ customExName: text })}
-                                            //             value={this.state.customExName}
-                                            //         />
-                                            //         <TouchableOpacity
-                                            //             onPress={this.backToHome.bind(this, item)}
-                                            //         >
-                                            //             <Image source={require('../icons/cancel.png')} style={styles.iconSize} />
-                                            //         </TouchableOpacity>
-                                            //     </View>
-                                            //     <View style={styles.customInputs}>
-                                                    
-                                            //         {/* <TextInput
-                                            //             style={styles.customInputStyle2}
-                                            //             placeholder="Exercise Amount"
-                                            //             placeholderTextColor="black"
-                                            //             onChangeText={(text) => this.setState({ customExAmount: text })}
-                                            //             value={this.state.customExAmount}
-                                            //         /> */}
-                                            //         <TextInput
-                                            //             style={styles.customInputStyle3}
-                                            //             placeholder="Exercise Unit"
-                                            //             placeholderTextColor="black"
-                                            //             onChangeText={(text) => this.setState({ customExUnit: text })}
-                                            //             value={this.state.customExUnit}
-                                            //         />
-                                            //     </View>
-                                            // </View>
-                                            
-                                           
-                                  
-
-                            })
-                            :
-                            null
-                    }
-                    <Toast ref="toastWithStyle"
-                        style={{ backgroundColor: '#FF6200' }}
-                        position={this.state.position}
-                        positionValue={50}
-                        fadeInDuration={750}
-                        fadeOutDuration={1000}
-                        opacity={0.8}
-                        textStyle={{ color: 'white' }}
-                    />
-                    <View style={{ flex: 2 }}>
+                    <View style={{ flex: 1.2 }}>
                     </View>
-                </View>
-                <View style={{ flex: 1.2 }}>
-                </View>
-            </ScrollView>
-         </KeyboardAwareView>
+                </ScrollView>
+            </KeyboardAwareView>
 
         )
     }

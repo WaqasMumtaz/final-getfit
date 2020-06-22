@@ -13,10 +13,13 @@ import { NativeAppEventEmitter } from 'react-native';
 console.log('NativeAppEventEmitter >>', NativeAppEventEmitter);
 import { SensorManager } from 'NativeModules';
 import Health from '../counter/health.ios';
+import AppleHealthKit from 'rn-apple-healthkit';
+
 
 const { height } = Dimensions.get('window');
 
-let initialValue = Number(0)
+let initialValue = Number(0);
+let percentageProgress = Number(0);
 
 
 class Reportscreen extends React.Component {
@@ -42,77 +45,94 @@ class Reportscreen extends React.Component {
       stepCountData: '',
       goalSteps: '',
       goalStepsDate: '',
-      currentWeekWeight:false,
-      lastWeekWeight:false,
-      stepsPercentage:'',
-      pedometerData:''
-
+      currentWeekWeight: false,
+      lastWeekWeight: false,
+      stepsPercentage: '',
+      pedometerData: '',
+      userLastWeekTotalRunningSteps: '',
+      userAllGoalSteps:'',
+      excerciseArry:[]
     }
   }
-   componentWillMount() {
-     this.getDaysData();
+  componentWillMount() {
+    this.getDaysData();
     // console.log('componentWillMount Run ')
-   const dateTo = moment().format('YYYY-MM-DD');
-   const dateFrom = moment().subtract(7,'d').format('YYYY-MM-DD');
-  //  console.log('Date To >>', dateTo);
-  //  console.log('DateFrom >>', dateFrom);
+    const dateTo = moment().format('YYYY-MM-DD');
+    const dateFrom = moment().subtract(7, 'd').format('YYYY-MM-DD');
+    //  console.log('Date To >>', dateTo);
+    //  console.log('DateFrom >>', dateFrom);
   }
 
-  componentDidMount(){
-    if(Platform.OS === 'android'){
+  componentDidMount() {
+    if (Platform.OS === 'android') {
       // HealthAndroid()
       SensorManager.startStepCounter(1000);
-          DeviceEventEmitter.addListener('StepCounter', (data) => {
-              // console.log('sensor manager data -->>', data)
-              this.setState({ pedometerData: data.steps }, () => {
-                  if (data.steps > Number(1)) {
-                      const multiplySteps = data.steps / Number(initialValue);
-                      //console.log('multiply >>',multiplySteps);
-                      const divideSteps = multiplySteps * 100;
-                      //console.log('divided >>',divideSteps )
-                      const roundedValue = Math.round(divideSteps);
-                      //console.log('percentage steps >>',roundedValue)
-                      this.setState({
-                          stepsPercentage: roundedValue
-                      })
-  
-                  }
-                  // if (data.steps != 0 && Number(this.state.goalSteps) != 0) {
-                  //     if (data.steps == Number(this.state.goalSteps)) {
-                  //         console.log('steps match ')
-                  //         // this.setState({
-                  //         //     showButton: true
-                  //         // })
-                  //     }
-                  // }
-  
-  
+      DeviceEventEmitter.addListener('StepCounter', (data) => {
+        // console.log('sensor manager data -->>', data)
+        this.setState({ pedometerData: data.steps })
+        // console.log('user steps -->', data.steps)
+      });
+
+    }
+    if (Platform.OS === 'ios') {
+      console.log('IOS Stepcounter Running Successfully ')
+      //  Health()
+      let userLastWeekTotalRunningSteps = 0;
+      // let d = new Date();
+      const last7dayDate = moment().subtract(7, 'days').toDate();
+      const yesterdayDate = moment().subtract(1, 'days').toDate();
+
+      // console.log('DAte >>', a);
+      let options1 = {
+        startDate: last7dayDate.toISOString(), // required
+        endDate: yesterdayDate.toISOString() // optional; default now
+      };
+      // console.log('Options1 >>', options1);
+      let options = {
+        permissions: {
+          read: ["Height", "Weight", "StepCount", "DateOfBirth", "BodyMassIndex"],
+          write: ["Weight", "StepCount", "BodyMassIndex", "Steps"]
+        }
+      };
+
+      AppleHealthKit.initHealthKit(options, (err, results) => {
+        if (err) {
+          console.log("error initializing Healthkit: ", err);
+          return;
+        }
+        else {
+          AppleHealthKit.getDailyStepCountSamples(options1, (err, results) => {
+            if (err) {
+              return;
+            }
+            // console.log('Steps >>',results);
+            for (var a in results) {
+              // console.log('Result Steps >>', results[a]);
+              const allStepsData = results[a];
+              userLastWeekTotalRunningSteps = userLastWeekTotalRunningSteps + Math.round(allStepsData.value);
+              // console.log('Total Steps Week >>', userLastWeekTotalRunningSteps);
+              this.setState({ pedometerData: userLastWeekTotalRunningSteps },()=>{
+                console.log("PedometerData >>" , this.state.pedometerData);
+                console.log('GoalSteps >>', this.state.userAllGoalSteps);
               })
-              // console.log('user steps -->', data.steps)
-  
-  
+            }
+           
+           
           });
-  
-  }
-          
-          if (Platform.OS === 'ios') {
-              console.log('IOS Stepcounter Running Successfully ')
-                            Health()
-                          // NativeAppEventEmitter.addListener(
-                          //   'StepChangedEvent',(steps)=>
-                          //   {
-                          //     console.log('Steps ios >>', steps)
-                          //   })
-                             
-                  
-          }  
+        }
+      })
+    
+
+
+    }
+    
   }
 
   getDaysData = () => {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener('didFocus', () => {
       // BackHandler.addEventListener("hardwareBackPress", this.onBack)
-       console.log('Running Successfully Add Listener Function')
+      console.log('Running Successfully Add Listener Function')
       this.getData();
     })
   }
@@ -136,8 +156,17 @@ class Reportscreen extends React.Component {
         // console.log('localstorage data >>', dataFromLocalStorage);
       }
     });
+    await AsyncStorage.getItem('logExercises').then((value) => {
+      let dataFromLocalStorage = JSON.parse(value);
+      //console.log('log exercises data >>', dataFromLocalStorage);
+      this.setState({
+        excerciseArry: dataFromLocalStorage
+      })
+    })
     //getting api complete data excersice or weight mearsment
-    let dataExcersice = await HttpUtils.get('getallexerciselog');
+    // console.log('Report Exercise Data >>', this.state.excerciseArry);
+    let dataExcersice = this.state.excerciseArry;
+    // let dataExcersice = await HttpUtils.get('getallexerciselog');
     let dataWeight = await HttpUtils.get('getweightlog');
     let userObj = {
       userId: userId
@@ -172,10 +201,12 @@ class Reportscreen extends React.Component {
     //   //   stepCountData:dataUser.stepCount
     //   // })
     // }
-    let data = dataExcersice.content;
+    
+    let data = dataExcersice;
+    // let data = dataExcersice.content;
     let weightData = dataWeight.content;
     let userGoalSteps = retrieveGoalSteps.content;
-    console.log('userGoalSteps >>', userGoalSteps)
+    // console.log('userGoalSteps >>', userGoalSteps)
     let userPedometerDataSteps = userPedometerData.content
     // console.log('User GoalSteps >>', userGoalSteps)
 
@@ -220,80 +251,42 @@ class Reportscreen extends React.Component {
         const justGoalSteps = userGoalSteps[i].goalSteps;
         //  console.log('goalSteps >>', goalStepsData)
         const date = goalStepsData.date;
-         console.log('goalSteps date >>', date);
+        //  console.log('goalSteps date >>', date);
         const getMonth = goalStepsData.month;
         const getMontName = monthName[getMonth];
         goalStepsData.monthName = getMontName;
         // console.log('goal month >>', getMonth);
         const getYear = goalStepsData.year;
-       const dateTo = moment().format('YYYY-MM-DD');
-       const dateFrom = moment().subtract(7,'d').format('YYYY-MM-DD');
-       console.log('DateTo >>',dateTo , 'DateFrom >>', dateFrom);
-        // console.log('goal steps year >>', getYear);
-        // let checkWeekDay = (Math.abs(currentDayOfWeek - goalStepsData.dayOfWeek));
-        // console.log('weekDay >>', checkWeekDay)
-        // let checkDate = Number(date) - currentDate;
-        // let checkMonth = Number(getMonth) - currentMonth;
-        // let checkYear = Number(getYear) - currentYear;
-        // const weekDate = Number(currentDate - 7);
-        // console.log('week Date >>', weekDate);
-        // console.log('check date >>', checkDate);
-        // console.log('check month >>', checkMonth);
-        // console.log('checkyear >>', checkYear);
-        //  console.log('moment time >>', moment())
+        const dateTo = moment().format('YYYY-MM-DD');
+        const dateFrom = moment().subtract(7, 'd').format('YYYY-MM-DD');
         let dayCount = 7;
         var toDate = new Date();
         for (var k = dayCount; k = dayCount; k--) {
           var sevenDaysAgo = moment().subtract(dayCount, 'days').toDate();
-           console.log('SevenDaysAgo Data >>', sevenDaysAgo);
+          //  console.log('SevenDaysAgo Data >>', sevenDaysAgo);
           var dayOfMonthAgo = sevenDaysAgo.getDate();
-           console.log('dayOfMonthAgo >>', dayOfMonthAgo);
+          //  console.log('dayOfMonthAgo >>', dayOfMonthAgo);
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
-           console.log('monthNoOfYear >>', monthNoOfYear);
-           var yearNo = sevenDaysAgo.getFullYear();
-           dayCount--;
+          //  console.log('monthNoOfYear >>', monthNoOfYear);
+          var yearNo = sevenDaysAgo.getFullYear();
+          dayCount--;
           //  console.log('DayCount >>', dayCount);
           //  console.log('jo date dali >', Number(date));
           //  console.log('jo month dala >',Number(getMonth));
           //  console.log('jo year dala tha >', Number(getYear));
           // for (var j = 0; j < data.length; j++) {
-            if (dayOfMonthAgo == Number(date) && monthNoOfYear == Number(getMonth) &&
-              yearNo == Number(getYear)) {
-                dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
-                 console.log('If Condition Data Exercise >>', dataExcersiceArr);
-                this.setState({
-                  weekAgoDateDataGoalSteps: dataExcersiceArr
-                },()=>console.log('State goalsteps >>', this.state.weekAgoDateDataGoalSteps))
-              // weeksProduct.push(data[j])
-            }
+          if (dayOfMonthAgo == Number(date) && monthNoOfYear == Number(getMonth) &&
+            yearNo == Number(getYear)) {
+            dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
+            //  console.log('If Condition Data Exercise >>', dataExcersiceArr);
+            this.setState({
+              weekAgoDateDataGoalSteps: dataExcersiceArr
+            }, () => console.log('State goalsteps >>', this.state.weekAgoDateDataGoalSteps))
+            // weeksProduct.push(data[j])
           }
+        }
 
-        // console.log('Waqas Mumtaz');
-        // if (checkDate == 0 || checkDate == -1 || checkDate == -2 || checkDate == -3 || checkDate == -4 || checkDate == -5 ||
-        //   checkDate == -6 || checkDate == -7 && checkMonth == 0 && checkYear == 0) {
-        //   dataExcersiceArr = [...dataExcersiceArr, goalStepsData];
-        //   this.setState({
-        //     weekAgoDateDataGoalSteps: dataExcersiceArr
-        //   },()=>{console.log('State Goal Steps >>',this.state.weekAgoDateDataGoalSteps)})
-        // }
-        // if (checkDate === 0 || checkDate === -1 || checkDate === -2 ||
-        //     checkDate === -3 || checkDate === -4 || checkDate === -5 ||
-        //     checkDate === -6 || checkDate === -7 && checkMonth === 0
-        //     ) {
-        //   console.log('True Condition')
-        //   dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
-        //   console.log('If Condition Data Exercise >>', dataExcersiceArr);
-        //   this.setState({
-        //     weekAgoDateDataGoalSteps: dataExcersiceArr
-        //   })
-        // }
-        // else {
-        //   dataExcersiceArr = [...dataExcersiceArr, 0];
-        //   console.log('Else Condition Data Exercise >>', dataExcersiceArr);
-        //   this.setState({
-        //     weekAgoDateDataGoalSteps: dataExcersiceArr
-        //   })
-        // }
+
       }
 
     }
@@ -311,24 +304,7 @@ class Reportscreen extends React.Component {
         // goalStepsData.monthName = getMontName;
         // console.log('month >>', getMonth);
         const getYear = Number(goalStepsData.year);
-        // console.log('current year >>', getYear);
-        // let checkWeekDay = (Math.abs(currentDayOfWeek - goalStepsData.dayOfWeek));
-        // console.log('weekDay >>', checkWeekDay)
-        // let checkDate = Number(date) - currentDate;
-        // let checkMonth = Number(getMonth) - currentMonth;
-        // let checkYear = Number(getYear) - currentYear;
-        // const weekDate = Number(currentDate - 7);
-        // console.log('week Date >>', weekDate);
-        // console.log('check date >>', checkDate);
-        // console.log('check month >>', checkMonth);
-        // console.log('checkyear >>', checkYear);
-        // if (checkDate == 0 || checkDate == -1 || checkDate == -2 || checkDate == -3 || checkDate == -4 || checkDate == -5 ||
-        //   checkDate == -6 || checkDate == -7 && checkMonth == 0 && checkYear == 0) {
-        //   dataExcersiceArr = [...dataExcersiceArr, goalStepsData];
-        //   this.setState({
-        //     weekAgoDateDataGoalSteps: dataExcersiceArr
-        //   },()=>{console.log('State Goal Steps >>',this.state.weekAgoDateDataGoalSteps)})
-        // }
+
 
         let dayCount = 7;
         var toDate = new Date();
@@ -339,34 +315,23 @@ class Reportscreen extends React.Component {
           // console.log('dayOfMonthAgo >>', dayOfMonthAgo);
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
           // console.log('monthNoOfYear >>', monthNoOfYear);
-           var yearNo = sevenDaysAgo.getFullYear();
-           dayCount--;
+          var yearNo = sevenDaysAgo.getFullYear();
+          dayCount--;
           //  console.log('jo date dali >', Number(date));
           //  console.log('jo month dala >',Number(getMonth));
           //  console.log('jo year dala tha >', Number(getYear));
           // for (var j = 0; j < data.length; j++) {
-            if (dayOfMonthAgo == date && monthNoOfYear == getMonth &&
-              yearNo == getYear) {
-                dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
-                // console.log('If Condition Data Exercise >>', dataExcersiceArr);
-                this.setState({
-                  weekAgoDateDataRunSteps: dataExcersiceArr
-                })
-              // weeksProduct.push(data[j])
-            }
+          if (dayOfMonthAgo == date && monthNoOfYear == getMonth &&
+            yearNo == getYear) {
+            dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
+            // console.log('If Condition Data Exercise >>', dataExcersiceArr);
+            this.setState({
+              weekAgoDateDataRunSteps: dataExcersiceArr
+            })
+            // weeksProduct.push(data[j])
           }
+        }
 
-        // if (checkDate == 0 || checkDate == -1 || checkDate == -2 || checkDate == -3 || checkDate == -4 || checkDate == -5 ||
-        //   checkDate == -6 || checkDate == -7 
-        //   && checkMonth == 0 || checkMonth == -1 || checkMonth == -2 || checkMonth == -3 ||
-        //   checkMonth == -4 || checkMonth == -5 || checkMonth == -6 || checkMonth == -7
-        //   || checkMonth == -8 || checkMonth == -9 || checkMonth == -10 ||
-        //   checkMonth == -11 || checkMonth == 0 && checkYear == 0) {
-        //   dataExcersiceArr = [...dataExcersiceArr, justGoalSteps];
-        //   this.setState({
-        //     weekAgoDateDataRunSteps: dataExcersiceArr
-        //   })
-        // }
       }
     }
 
@@ -398,61 +363,61 @@ class Reportscreen extends React.Component {
           var monthNoOfYear = sevenDaysAgo.getMonth() + 1;
           //  console.log('Month No of Year >>', monthNoOfYear);
           var monthFinde = Number(dataApi.month) - monthNoOfYear
-            // console.log('monthNoOf Finder >>', monthFinde);
-           var yearNo = sevenDaysAgo.getFullYear();
-           dayCount--;
+          // console.log('monthNoOf Finder >>', monthFinde);
+          var yearNo = sevenDaysAgo.getFullYear();
+          dayCount--;
           //  console.log('L numbers >>', l);
-        if (l == 7){
-          const weekBefore1 = Math.abs(dayOfMonthAgo - 1);
-          // console.log('WeeBefore1 >>', weekBefore1)
-          const weekBefore2 = Math.abs(dayOfMonthAgo - 2);
-          const weekBefore3 = Math.abs(dayOfMonthAgo - 3);
-          const weekBefore4 = Math.abs(dayOfMonthAgo - 4);
-          const weekBefore5 = Math.abs(dayOfMonthAgo - 5);
-          const weekBefore6 = Math.abs(dayOfMonthAgo - 6);
-          // console.log('WeeBefore6 >>', weekBefore6)
-          const weekBefore7 = Math.abs(dayOfMonthAgo - 7);
-          // console.log('WeekBefore DAta >>',weekBefore)
-          if(weekBefore1 == Number(dataApi.dayOfMonth)
-           || weekBefore2 == Number(dataApi.dayOfMonth)
-           || weekBefore3 == Number(dataApi.dayOfMonth)
-           || weekBefore4 == Number(dataApi.dayOfMonth)
-           ||weekBefore5 == Number(dataApi.dayOfMonth)
-           || weekBefore6 == Number(dataApi.dayOfMonth)
-           || weekBefore7 == Number(dataApi.dayOfMonth)
-          && monthFinde == 0 || monthFinde == -1 || monthFinde == 1
-          && yearNo == Number(dataApi.year)){
-            weekBefore = dataApi
-            this.setState({
-              weekAgoDateDataWeights: weekBefore,
-              lastWeekWeight:true,
-              // currentWeekWeight:false
-            })
+          if (l == 7) {
+            const weekBefore1 = Math.abs(dayOfMonthAgo - 1);
+            // console.log('WeeBefore1 >>', weekBefore1)
+            const weekBefore2 = Math.abs(dayOfMonthAgo - 2);
+            const weekBefore3 = Math.abs(dayOfMonthAgo - 3);
+            const weekBefore4 = Math.abs(dayOfMonthAgo - 4);
+            const weekBefore5 = Math.abs(dayOfMonthAgo - 5);
+            const weekBefore6 = Math.abs(dayOfMonthAgo - 6);
+            // console.log('WeeBefore6 >>', weekBefore6)
+            const weekBefore7 = Math.abs(dayOfMonthAgo - 7);
+            // console.log('WeekBefore DAta >>',weekBefore)
+            if (weekBefore1 == Number(dataApi.dayOfMonth)
+              || weekBefore2 == Number(dataApi.dayOfMonth)
+              || weekBefore3 == Number(dataApi.dayOfMonth)
+              || weekBefore4 == Number(dataApi.dayOfMonth)
+              || weekBefore5 == Number(dataApi.dayOfMonth)
+              || weekBefore6 == Number(dataApi.dayOfMonth)
+              || weekBefore7 == Number(dataApi.dayOfMonth)
+              && monthFinde == 0 || monthFinde == -1 || monthFinde == 1
+              && yearNo == Number(dataApi.year)) {
+              weekBefore = dataApi
+              this.setState({
+                weekAgoDateDataWeights: weekBefore,
+                lastWeekWeight: true,
+                // currentWeekWeight:false
+              })
+
+            }
 
           }
-
-        }
           //  console.log('day count >', dayCount--);
           //  console.log('jo month dala >',Number(getMonth));
           //  console.log('jo year dala tha >', Number(getYear));
-             //current date data
-        if (dayOfMonthAgo == Number(dataApi.dayOfMonth) && monthNoOfYear == Number(dataApi.month)
+          //current date data
+          if (dayOfMonthAgo == Number(dataApi.dayOfMonth) && monthNoOfYear == Number(dataApi.month)
             && yearNo == Number(dataApi.year)) {
-          // console.log(currentDateDataWeights)
-          cureentWeekData = dataApi,
-          // console.log('CurrentWeekData >>', cureentWeekData);
-          this.setState({
-            currentDateDataWeights: cureentWeekData,
-            currentWeekWeight:true,
-            lastWeekWeight:false
-          })
+            // console.log(currentDateDataWeights)
+            cureentWeekData = dataApi,
+              // console.log('CurrentWeekData >>', cureentWeekData);
+              this.setState({
+                currentDateDataWeights: cureentWeekData,
+                currentWeekWeight: true,
+                lastWeekWeight: false
+              })
+          }
+
+
+
         }
-        
 
-        
-      }
 
-       
 
 
       }
@@ -512,48 +477,42 @@ class Reportscreen extends React.Component {
       currentWeekWeight,
       lastWeekWeight,
       stepsPercentage,
-      pedometerData
+      pedometerData,
     } = this.state
-    // console.log(loseWeight, 'loseWeight')
+     console.log('dataExcersices >>', dataExcersices)
+
     weekAgoDateDataGoalSteps && weekAgoDateDataGoalSteps.map((item, index) => {
       return initialValue = initialValue + Number(item);
     })
-    // console.log('Total Steps >>', initialValue);
+    
+
     let runSteps = Number(0);
     weekAgoDateDataRunSteps && weekAgoDateDataRunSteps.map((item, index) => {
       return runSteps = runSteps + Number(item)
     })
-    const multiplySteps = runSteps / initialValue;
-    //console.log('multiply >>',multiplySteps);
-    const divideSteps = multiplySteps * 100;
-    //console.log('divided >>',divideSteps )
-    const roundedValue = Math.round(divideSteps);
-    //console.log('percentage steps >>',roundedValue)
-    // this.setState({
-    //   stepsPercentage: roundedValue
-    // })
+    
     let lastIndex = dataExcersices.lastIndexOf();
     // console.log('Last Inde')
     let weeklyExcersice = dataExcersices && dataExcersices.map((elem, key) => {
       return (
-        <View style={[lastIndex == key ? styles.exerciseResultCard2 : styles.exerciseResultCard]}>
-          <Text style={styles.resultHeading}>
+        <View style={[lastIndex == key ? styles.exerciseResultCard2 : styles.exerciseResultCard]} key={key}>
+          <Text style={styles.resultHeading} key={key}>
             {elem.exerciseName}
           </Text>
           <View style={styles.dataResultParent}>
             <View style={styles.timeShowContainer}>
-              <Text style={styles.timeShow}>
+              <Text style={styles.timeShow} key={key}>
                 {`${elem.exerciseAmount} ${elem.exerciseUnit}`}
               </Text>
             </View>
             <View style={styles.dateAndMonth}>
-              <Text maxLength={3} style={styles.dateAndMonthShow}>
-                {elem.monthName.substring(0,3)}
+              <Text maxLength={3} style={styles.dateAndMonthShow} key={key}>
+                {elem.monthName.substring(0, 3)}
               </Text>
-              <Text style={styles.dateNumber}>
+              <Text style={styles.dateNumber} key={key}>
                 {elem.dayOfMonth}
               </Text>
-              <Text style={styles.superScriptTextStyle}>
+              <Text style={styles.superScriptTextStyle} key={key}>
                 {elem.dayOfMonth == 1 ? 'st' : elem.dayOfMonth == 2 ? '2nd' : elem.dayOfMonth == 3 ? 'rd' : 'th'}
               </Text>
             </View>
@@ -584,13 +543,7 @@ class Reportscreen extends React.Component {
                     size={65}
                     width={10}
                     color={'#FF6200'}
-                    // progress={runSteps > 1 && runSteps < 250 ? 25 :
-                    //   runSteps > 250 && runSteps < 500 ? 50 :
-                    //   runSteps > 500 && runSteps < 750 ? 75 :
-                    //   runSteps > 750 && runSteps <= 10000 ? 100
-                    //         : 0
-                    // }
-                    progress={stepsPercentage == '' ? 0 : stepsPercentage}
+                    progress={pedometerData == '' ? 0 : pedometerData}
                     backgroundColor={'gray'}
                     animateFromValue={0}
                     fullColor={'#FF6200'}
@@ -611,25 +564,25 @@ class Reportscreen extends React.Component {
                   <View style={styles.borderLines1}>
                     {
                       currentWeekWeight ?
-                      <Text style={styles.kgTextOne}>
-                      {currentDateDataWeights.weight}
-                    </Text>
-                    :
-                    <Text style={styles.kgTextOne}>
-                      0 KG
+                        <Text style={styles.kgTextOne}>
+                          {currentDateDataWeights.weight}
+                        </Text>
+                        :
+                        <Text style={styles.kgTextOne}>
+                          0 KG
                     </Text>
                     }
                     {
                       lastWeekWeight ?
-                      <Text style={styles.kgTextTwo}>
-                      {weekAgoDateDataWeights.weight}
-                    </Text>
-                    :
-                    <Text style={styles.kgTextTwo}>
-                      0 KG
+                        <Text style={styles.kgTextTwo}>
+                          {weekAgoDateDataWeights.weight}
+                        </Text>
+                        :
+                        <Text style={styles.kgTextTwo}>
+                          0 KG
                     </Text>
                     }
-                    
+
                   </View>
                   <View style={styles.weeksTextContainer}>
                     <Text style={styles.thisWeek}>This week</Text>

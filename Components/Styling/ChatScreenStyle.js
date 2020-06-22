@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
     },
     mgsImges: {
         padding: 5,
-        color: '#A6A6A6',
-        marginBottom: 20,
+        // color: '#A6A6A6',
+        marginBottom: 10,
         borderRadius: 5,
         width: 200,
         height: 200,
@@ -133,13 +133,12 @@ const styles = StyleSheet.create({
     },
     replymgsImges: {
         padding: 10,
-        color: '#4f4f4f',
+        // color: '#4f4f4f',
         marginBottom: 20,
         marginRight: '50%',
         borderRadius: 5,
         width: 200,
         height: 200,
-        resizeMode: 'contain'
     },
     expandImges: {
        // padding: 60,

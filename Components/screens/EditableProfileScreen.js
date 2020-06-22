@@ -22,6 +22,8 @@ import ImagePicker from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import Toast, { DURATION } from 'react-native-easy-toast'
 import OverlayLoader from '../Loader/OverlaySpinner'
+import { KeyboardAwareView } from 'react-native-keyboard-aware-view'
+
 
 const userDefaultPic = require('../icons/profile.png')
 const { height } = Dimensions.get('window');
@@ -55,7 +57,7 @@ class EditProfileScreen extends React.Component {
             objectId: '',
             male: false,
             female: false,
-            position : 'top',
+            position: 'top',
             profile: '',
             type: ''
         }
@@ -158,20 +160,20 @@ class EditProfileScreen extends React.Component {
         this.setState({
             address: text
         }
-        , () => {
-            if (this.state.address.length < 8) {
-                this.setState({
-                    addressValidate: false,
-                    addressInstruction: true
-                })
+            , () => {
+                if (this.state.address.length < 8) {
+                    this.setState({
+                        addressValidate: false,
+                        addressInstruction: true
+                    })
+                }
+                if (this.state.address.length > 8) {
+                    this.setState({
+                        addressValidate: true,
+                        addressInstruction: false
+                    })
+                }
             }
-            if (this.state.address.length > 8) {
-                this.setState({
-                    addressValidate: true,
-                    addressInstruction: false
-                })
-            }
-        }
         )
     }
     chooseProfilePhoto = () => {
@@ -327,43 +329,44 @@ class EditProfileScreen extends React.Component {
             name,
         } = this.state;
         return (
-            <View style={styles.mainContainer}>
-                <ScrollView style={{ flex: 1, backgroundColor: 'white', height: height }} contentContainerStyle={{ flexGrow: 1 }}>
-                    <View style={styles.profilPicContainer}>
-                        <TouchableOpacity activeOpacity={0.5} onPress={this.chooseProfilePhoto}>
-                            {avatarSource ?
-                                <Image source={{ uri: `${avatarSource}` }} style={styles.profilPicStyle} />
-                                :
-                                <Image source={userDefaultPic} style={styles.profilPicStyle} />
-                            }
-                        </TouchableOpacity>
-                        {/* <View style={styles.nameContainer}>
+            <KeyboardAwareView animated={true}>
+                <View style={styles.mainContainer}>
+                    <ScrollView style={{ flex: 1, backgroundColor: 'white', height: height }} contentContainerStyle={{ flexGrow: 1 }}>
+                        <View style={styles.profilPicContainer}>
+                            <TouchableOpacity activeOpacity={0.5} onPress={this.chooseProfilePhoto}>
+                                {avatarSource ?
+                                    <Image source={{ uri: `${avatarSource}` }} style={styles.profilPicStyle} />
+                                    :
+                                    <Image source={userDefaultPic} style={styles.profilPicStyle} />
+                                }
+                            </TouchableOpacity>
+                            {/* <View style={styles.nameContainer}>
                             <Text style={styles.nameStyle}>{this.state.name}</Text>
                         </View>
                         <View style={styles.userTitle}>
                             <Text style={styles.userTitleStyle}>Trainee</Text>
                         </View> */}
-                    </View>
-                    <View style={styles.emailContainer}>
-                        <Text style={styles.inputLabelsStyle}>Name</Text>
-                        <TextInput
-                            onChangeText={text => {
-                                this.setState({
-                                    name: text
-                                })
-                            }}
-                            placeholder="Enter your name"
-                            placeholderColor="#4f4f4f"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            value={name}
-                            style={[styles.inputTextStyle]}
-                        />
-                    </View>
-                    <View style={styles.emailContainer}>
-                        <Text style={styless.labelStyle}>Email</Text>
-                        <Text style={styless.userInsertedValueStyle}>{email}</Text>
-                        {/* <TextInput
+                        </View>
+                        <View style={styles.emailContainer}>
+                            <Text style={styles.inputLabelsStyle}>Name</Text>
+                            <TextInput
+                                onChangeText={text => {
+                                    this.setState({
+                                        name: text
+                                    })
+                                }}
+                                placeholder="Enter your name"
+                                placeholderColor="#4f4f4f"
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                value={name}
+                                style={[styles.inputTextStyle]}
+                            />
+                        </View>
+                        <View style={styles.emailContainer}>
+                            <Text style={styless.labelStyle}>Email</Text>
+                            <Text style={styless.userInsertedValueStyle}>{email}</Text>
+                            {/* <TextInput
                             onChangeText={text => {
                                 this.checkValidation(text, 'email'),
                                     this.setState({
@@ -378,8 +381,8 @@ class EditProfileScreen extends React.Component {
                             value={email}
                             style={[styles.inputTextStyle, !this.state.emailValidate ? styles.errorInput : null]}
                         /> */}
-                    </View>
-                    {/* <View style={styles.passwrdContainer}>
+                        </View>
+                        {/* <View style={styles.passwrdContainer}>
                         <Text style={styles.inputLabelsStyle}>Password</Text>
                         <TextInput
                             onChangeText={text => { this.passwordHandleValue(text) }}
@@ -390,84 +393,85 @@ class EditProfileScreen extends React.Component {
                             style={[styles.inputTextStyle, !passwordValidate ? styles.errorInput : null]}
                         />
                     </View> */}
-                    {/* {psswrdInstruction && <View style={styles.passwrdInstructionContainer}>
+                        {/* {psswrdInstruction && <View style={styles.passwrdInstructionContainer}>
                         <Text style={styles.instructionStyle}>
                             Password strength is required maximum 9 and greater then 4
                          </Text>
                     </View>} */}
-                    <View style={styles.addressContainer}>
-                        <Text style={styles.inputLabelsStyle}>Address</Text>
-                        <TextInput
-                            onChangeText={text => { this.addressValueHandle(text) }}
-                            placeholder="Type here your address..."
-                            placeholderColor="#4f4f4f"
-                            value={address}
-                            style={[styles.inputTextStyle, !addressValidate ? styles.errorInput : null]}
-                        />
-                    </View>
-                    {addressInstruction && <View>
-                        <Text style={styles.instructionStyle}>
-                            Address length must be minimum 8
-                         </Text>
-                    </View>}
-                    <View style={styles.contactNumberContainer}>
-                        <Text style={styles.inputLabelsStyle}>Contact Number</Text>
-                        <TextInput
-                            onChangeText={text => {
-                                this.checkValidation(text, 'mobile'),
-                                    this.setState({
-                                        contactNo: text
-                                    })
-                            }}
-                            placeholder="number"
-                            placeholderColor="#4f4f4f"
-                            value={contactNo}
-                            keyboardType={"numeric"}
-                            style={[styles.inputTextStyle, !contactNoValidate ? styles.errorInput : null]}
-                        />
-                    </View>
-                    <View style={styles.genderContainer}>
-                        <Text style={styles.inputLabelsStyle}>Gender</Text>
-                        <View style={styles.childGender}>
-                            <TouchableOpacity style={male ? styles.clickedMale : styles.maleTouchableOpacity}
-                                onPress={this.getGender.bind(this, 'Male')}>
-                                <Text style={styles.maleTextStyle}>
-                                    Male
-                            </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={female ? styles.clickedFemale : styles.femaleContainer}
-                                onPress={this.getGender.bind(this, 'Female')}>
-                                <Text style={styles.maleTextStyle}>Female</Text>
-                            </TouchableOpacity>
+                        <View style={styles.addressContainer}>
+                            <Text style={styles.inputLabelsStyle}>Address</Text>
+                            <TextInput
+                                onChangeText={text => { this.addressValueHandle(text) }}
+                                placeholder="Type here your address..."
+                                placeholderColor="#4f4f4f"
+                                value={address}
+                                style={[styles.inputTextStyle, !addressValidate ? styles.errorInput : null]}
+                            />
                         </View>
-                    </View>
-                    {
-                        //     isLoading && <View style={[styles.spinerContainer, styles.horizontal]}>
-                        //     <ActivityIndicator size='large' color="#FF6200" />
-                        // </View>
-                        isLoading ? <OverlayLoader /> : null
-                    }
-                    <View style={styles.btnContainer}>
-                        <CaloriesSetupBtn
-                            title='Edit Profile'
-                            caloriesBtnStyle={styles.caloriesBtnStyle}
-                            onPress={this.updateUserProfileFunc}
+                        {addressInstruction && <View>
+                            <Text style={styles.instructionStyle}>
+                                Address length must be minimum 8
+                         </Text>
+                        </View>}
+                        <View style={styles.contactNumberContainer}>
+                            <Text style={styles.inputLabelsStyle}>Contact Number</Text>
+                            <TextInput
+                                onChangeText={text => {
+                                    this.checkValidation(text, 'mobile'),
+                                        this.setState({
+                                            contactNo: text
+                                        })
+                                }}
+                                placeholder="number"
+                                placeholderColor="#4f4f4f"
+                                value={contactNo}
+                                keyboardType={"numeric"}
+                                style={[styles.inputTextStyle, !contactNoValidate ? styles.errorInput : null]}
+                            />
+                        </View>
+                        <View style={styles.genderContainer}>
+                            <Text style={styles.inputLabelsStyle}>Gender</Text>
+                            <View style={styles.childGender}>
+                                <TouchableOpacity style={male ? styles.clickedMale : styles.maleTouchableOpacity}
+                                    onPress={this.getGender.bind(this, 'Male')}>
+                                    <Text style={styles.maleTextStyle}>
+                                        Male
+                            </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={female ? styles.clickedFemale : styles.femaleContainer}
+                                    onPress={this.getGender.bind(this, 'Female')}>
+                                    <Text style={styles.maleTextStyle}>Female</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        {
+                            //     isLoading && <View style={[styles.spinerContainer, styles.horizontal]}>
+                            //     <ActivityIndicator size='large' color="#FF6200" />
+                            // </View>
+                            isLoading ? <OverlayLoader /> : null
+                        }
+                        <View style={styles.btnContainer}>
+                            <CaloriesSetupBtn
+                                title='Edit Profile'
+                                caloriesBtnStyle={styles.caloriesBtnStyle}
+                                onPress={this.updateUserProfileFunc}
+                            />
+                        </View>
+                        <View style={styles.blankContainer}>
+                        </View>
+                        <Toast ref="toastWithStyle"
+                            style={{ backgroundColor: '#FF6200' }}
+                            position={this.state.position}
+                            positionValue={50}
+                            fadeInDuration={750}
+                            fadeOutDuration={1000}
+                            opacity={0.8}
+                            textStyle={{ color: 'white' }}
                         />
-                    </View>
-                    <View style={styles.blankContainer}>
-                    </View>
-                    <Toast ref="toastWithStyle"
-                        style={{ backgroundColor: '#FF6200' }}
-                        position={this.state.position}
-                        positionValue={50}
-                        fadeInDuration={750}
-                        fadeOutDuration={1000}
-                        opacity={0.8}
-                        textStyle={{ color: 'white' }}
-                    />
 
-                </ScrollView>
-            </View>
+                    </ScrollView>
+                </View>
+            </KeyboardAwareView>
 
         )
     }
